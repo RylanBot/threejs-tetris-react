@@ -1,0 +1,208 @@
+$color-game-bg: #484954;
+$color-game-title: #f7bbdf;
+$color-game-title-shadow: #794969;
+$color-start-btn: #d77469;
+$color-start-btn-shadow: #c0392b;
+$color-quit-btn: #77c899;
+$color-quit-btn-shadow: #27ae60;
+
+
+* {
+    margin: 0;
+    padding: 0;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    font-family: Georgia;
+}
+
+.game-header {
+    position: absolute;
+    width: 100vw;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+
+    .github-logo {
+        height: 45px;
+        margin-right: 10px;
+        vertical-align: middle;
+        border: 3px solid #333;
+        box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        background-color: #fff;
+        transform: perspective(500px) rotateX(10deg) rotateY(10deg);
+        transition: transform 0.3s ease;
+    }
+
+    .title-3d {
+        margin: 0;
+        font-size: 3em;
+        color: $color-game-title;
+        text-shadow:
+            1px 1px 0 $color-game-title-shadow,
+            2px 2px 0 $color-game-title-shadow,
+            3px 3px 0 $color-game-title-shadow,
+            4px 4px 0 $color-game-title-shadow,
+            5px 5px 0 $color-game-title-shadow;
+        padding: 5px 10px;
+        border-radius: 5px;
+        letter-spacing: 5px;
+    }
+
+    .game-buttons-container {
+        margin: 0;
+        display: flex;
+        gap: 10px;
+        z-index: 10;
+        gap: 10px;
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .button-3d {
+            border: none;
+            margin: 10px;
+            padding: 10px 20px;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            outline: none;
+            text-shadow: 0px -1px 0px $color-game-title-shadow;
+            width: 100px;
+            text-align: center;
+
+            &:active {
+                left: 6px;
+                top: 6px;
+            }
+        }
+
+        .button-3d-pause {
+            background-color: $color-start-btn;
+            box-shadow:
+                6px 0px 0px $color-start-btn-shadow,
+                10px 0px 20px rgba($color-start-btn, 0.3);
+
+            &:active {
+                box-shadow:
+                    2px 0px 0px $color-start-btn-shadow,
+                    5px 0px 10px rgba($color-start-btn, 0.3);
+            }
+        }
+
+        .button-3d-start {
+            background-color: $color-quit-btn;
+            box-shadow:
+                6px 0px 0px $color-quit-btn-shadow,
+                10px 0px 20px rgba($color-quit-btn, 0.3);
+
+            &:active {
+                box-shadow:
+                    2px 0px 0px $color-quit-btn-shadow,
+                    5px 0px 10px rgba($color-quit-btn, 0.3);
+            }
+        }
+
+    }
+}
+
+.game-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background: $color-game-bg;
+
+    .game-canvas-left {
+        width: 40%;
+        height: 100%;
+        background: $color-game-bg,
+    }
+
+    .game-canvas-right {
+        width: 25%;
+        height: 100%;
+        background: $color-game-bg;
+
+        .next-block-label {
+            color: white;
+        }
+
+        .score-label {
+            color: white;
+            white-space: nowrap;
+        }
+
+        .instructions-label {
+            white-space: nowrap;
+            color: #ababab;
+            padding: 10px;
+
+            ul {
+                list-style-type: none;
+                padding-left: 0;
+
+                li {
+                    margin-bottom: 10px;
+
+                    &>strong {
+                        font-weight: bold;
+                        color: #ddd;
+                    }
+
+                    ul {
+                        margin-top: 5px;
+                        padding-left: 20px;
+
+                        li {
+                            font-size: 0.95em;
+                        }
+                    }
+                }
+            }
+
+            span {
+                font-size: 1.2em;
+            }
+        }
+
+        .axis-label {
+            color: white;
+            font-family: Georgia;
+            text-align: center;
+        }
+    }
+
+}
+
+.game-over-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 11;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px 40px;
+    border-radius: 15px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+
+    h1 {
+        font-size: 2em;
+        color: #333;
+        text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+    }
+}
