@@ -330,7 +330,12 @@ const Tetris: React.FC = () => {
                 <h1 className='title-3d'>3D &nbsp;Tetris</h1>
 
                 <div className='game-buttons-container'>
-                    <button type="button" onClick={gameStarted ? resetGame : startGame} className="button-3d button-3d-start">
+                    <button
+                        type="button"
+                        onKeyDown={(event) => { if (event.key === ' ') event.preventDefault() }}
+                        onClick={gameStarted ? resetGame : startGame}
+                        className="button-3d button-3d-start"
+                    >
                         {gameStarted ? "Quit" : "Start"}
                     </button>
                     <button
