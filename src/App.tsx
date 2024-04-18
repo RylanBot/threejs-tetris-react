@@ -1,5 +1,3 @@
-import "./assets/scss/global.scss"
-
 import Tetris from "./pages/Tetris"
 
 function App() {
@@ -9,6 +7,5 @@ function App() {
     </>
   )
 }
-
 
 export default App

@@ -1,10 +1,11 @@
-/* 迷你坐标轴 */
-
 import { Html } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import React, { useEffect, useRef } from 'react';
 import { ArrowHelper, Color, Group, Vector3 } from 'three';
 
+/**
+ * 迷你坐标轴
+ */
 interface MiniAxesProps {
     position?: [number, number, number];
     cameraDirection: Vector3;
@@ -45,7 +46,6 @@ const MiniAxes: React.FC<MiniAxesProps> = ({ position = [0, 0, 0], cameraDirecti
         scene.remove(groupRef.current);
     };
 
-
     useEffect(() => {
         setupArrows();
         scene.add(groupRef.current);
@@ -53,8 +53,9 @@ const MiniAxes: React.FC<MiniAxesProps> = ({ position = [0, 0, 0], cameraDirecti
         return () => {
             cleanupArrows();
         };
-    }, [scene]);
 
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [scene]);
 
     // 每一帧渲染时随着传入的方向一起旋转
     useFrame(() => {

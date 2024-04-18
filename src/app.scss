@@ -6,7 +6,6 @@ $color-start-btn-shadow: #c0392b;
 $color-quit-btn: #77c899;
 $color-quit-btn-shadow: #27ae60;
 
-
 * {
     margin: 0;
     padding: 0;
@@ -20,7 +19,7 @@ $color-quit-btn-shadow: #27ae60;
 .game-header {
     position: absolute;
     width: 100vw;
-    top: 40px;
+    top: 20px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
@@ -32,13 +31,9 @@ $color-quit-btn-shadow: #27ae60;
     .github-logo {
         height: 45px;
         margin-right: 10px;
-        vertical-align: middle;
-        border: 3px solid #333;
         box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
         border-radius: 50%;
         background-color: #fff;
-        transform: perspective(500px) rotateX(10deg) rotateY(10deg);
-        transition: transform 0.3s ease;
     }
 
     .title-3d {
@@ -51,7 +46,7 @@ $color-quit-btn-shadow: #27ae60;
             3px 3px 0 $color-game-title-shadow,
             4px 4px 0 $color-game-title-shadow,
             5px 5px 0 $color-game-title-shadow;
-        padding: 5px 10px;
+        padding:40px 10px;
         border-radius: 5px;
         letter-spacing: 5px;
     }
@@ -61,7 +56,6 @@ $color-quit-btn-shadow: #27ae60;
         display: flex;
         gap: 10px;
         z-index: 10;
-        gap: 10px;
 
         .hidden {
             opacity: 0;
@@ -114,7 +108,6 @@ $color-quit-btn-shadow: #27ae60;
                     5px 0px 10px rgba($color-quit-btn, 0.3);
             }
         }
-
     }
 }
 
@@ -155,9 +148,10 @@ $color-quit-btn-shadow: #27ae60;
             ul {
                 list-style-type: none;
                 padding-left: 0;
-
+                margin: 10px 0;
+                
                 li {
-                    margin-bottom: 10px;
+                    margin: 10px 0;
 
                     &>strong {
                         font-weight: bold;
@@ -176,13 +170,12 @@ $color-quit-btn-shadow: #27ae60;
             }
 
             span {
-                font-size: 1.2em;
+                font-size: 1.1em;
             }
         }
 
         .axis-label {
             color: white;
-            font-family: Georgia;
             text-align: center;
         }
     }

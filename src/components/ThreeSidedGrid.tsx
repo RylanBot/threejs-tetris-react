@@ -1,7 +1,7 @@
-/* 6×6×12的空间网格组件 */
-
+/**
+ * 6×6×12的空间网格组件 
+ */
 const ThreeSidedGrid: React.FC = () => {
-
     const size = 6;
     const divisions = 6;
     const color = "gray"

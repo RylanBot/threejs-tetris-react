@@ -1,5 +1,3 @@
-/* 获取当前 Canvas 的相机角度 */
-
 import { useFrame, useThree } from "react-three-fiber";
 import { Vector3 } from "three";
 
@@ -7,7 +5,10 @@ interface CameraDirectionUpdaterProps {
     setDirection: (dir: Vector3) => void;
 }
 
-export const CameraDirectionUpdater: React.FC<CameraDirectionUpdaterProps> = ({ setDirection }) => {
+/**
+ * 获取当前 Canvas 的相机角度
+ */
+const CameraDirectionUpdater: React.FC<CameraDirectionUpdaterProps> = ({ setDirection }) => {
     const { camera } = useThree();
 
     useFrame(() => {
@@ -18,3 +19,5 @@ export const CameraDirectionUpdater: React.FC<CameraDirectionUpdaterProps> = ({ 
 
     return null;
 };
+
+export default CameraDirectionUpdater;
