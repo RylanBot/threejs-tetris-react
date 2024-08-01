@@ -4,7 +4,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Vector3 } from 'three';
 
 import CameraDirectionUpdater from '@/components/CameraDirectionUpdater';
+import ControlButton from '@/components/ControlButton';
 import MiniAxes from '@/components/MiniAxes';
+import MobileControlGroup from '@/components/MobileControlGroup';
 import { Block, FallenCubes, TetriminoSet, TetriminoType, Tetriminos } from '@/components/Tetrimino';
 import ThreeSidedGrid from '@/components/ThreeSidedGrid';
 
@@ -327,24 +329,25 @@ const Tetris: React.FC = () => {
                     <img src={'https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png'} alt="Project Repository" className="github-logo" />
                 </a>
 
-                <h1 className='title-3d'>3D &nbsp;Tetris</h1>
+                <h1 className='title-3d'>3D Tetris</h1>
 
                 <div className='game-buttons-container'>
-                    <button
-                        type="button"
-                        onKeyDown={(event) => { if (event.key === ' ') event.preventDefault() }}
+                    <ControlButton
                         onClick={gameStarted ? resetGame : startGame}
-                        className="button-3d button-3d-start"
-                    >
+                        bgColor='#77c899'
+                        shadowColor='#27ae60'
+                    > 
                         {gameStarted ? "Quit" : "Start"}
-                    </button>
-                    <button
-                        type="button"
+                    </ControlButton>
+
+                    <ControlButton
                         onClick={togglePause}
-                        className={`button-3d button-3d-pause ${gameStarted && !gameOver ? '' : 'hidden'}`}
-                    >
+                        bgColor='#d77469'
+                        shadowColor='#c0392b'
+                        style = {{display: gameStarted && !gameOver ? 'block' : 'none'}}
+                    > 
                         {isPaused ? "Continue" : "Pause"}
-                    </button>
+                    </ControlButton>
                 </div>
             </div>
 
@@ -367,9 +370,9 @@ const Tetris: React.FC = () => {
                             minPolarAngle={0} maxPolarAngle={Math.PI / 2}
                             minAzimuthAngle={0} maxAzimuthAngle={Math.PI / 2}
                             enabled={!isPaused}
+                            enablePan={false}
                         />
                         <CameraDirectionUpdater setDirection={setCameraDirection} />
-
 
                         <ThreeSidedGrid />
                         {type && position && blocks && (
@@ -386,12 +389,12 @@ const Tetris: React.FC = () => {
 
                         {nextType && (
                             <>
-                                <Html position={[-0.75, 1.75, 0]} className='next-block-label'>
+                                <Html position={[-0.75, 1.55, 0]} className='next-block-label'>
                                     <h2>Next:</h2>
                                 </Html>
                                 <TetriminoSet
                                     type={nextType}
-                                    position={[0.4, 1.6, 0]}
+                                    position={[0.55, 1.4, 0]}
                                     blocks={Tetriminos[nextType].blocks}
                                     scale={0.15} />
 
@@ -413,10 +416,11 @@ const Tetris: React.FC = () => {
                                 <li><strong>Hard Drop:</strong> <span>Space</span></li>
                             </ul>
                         </Html>
-                        <MiniAxes cameraDirection={cameraDirection} position={[0, -2, 0]} />
-
+                        <MiniAxes cameraDirection={cameraDirection} position={[0.25, -2.5, 0]} />
                     </Canvas>
                 </div>
+
+                <MobileControlGroup/>
             </div>
         </>
     );

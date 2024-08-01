@@ -1,10 +1,6 @@
 $color-game-bg: #484954;
-$color-game-title: #f7bbdf;
-$color-game-title-shadow: #794969;
-$color-start-btn: #d77469;
-$color-start-btn-shadow: #c0392b;
-$color-quit-btn: #77c899;
-$color-quit-btn-shadow: #27ae60;
+$color-game-title: #ffc5e8;
+$color-game-title-shadow: #855575;
 
 * {
     margin: 0;
@@ -14,6 +10,27 @@ $color-quit-btn-shadow: #27ae60;
     -ms-user-select: none;
     user-select: none;
     font-family: Georgia;
+}
+
+.button-3d {
+    border: none;
+    margin: 10px;
+    padding: 10px 20px;
+    color: white;
+    font-size: 16px;
+    border-radius: 5px;
+    position: relative;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    outline: none;
+    text-shadow: 0px -1px 0px $color-game-title-shadow;
+    width: 100px;
+    text-align: center;
+
+    &:active {
+        left: 6px;
+        top: 6px;
+    }
 }
 
 .game-header {
@@ -30,7 +47,7 @@ $color-quit-btn-shadow: #27ae60;
 
     .github-logo {
         height: 45px;
-        margin-right: 10px;
+        margin: 0 10px;
         box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
         border-radius: 50%;
         background-color: #fff;
@@ -42,11 +59,8 @@ $color-quit-btn-shadow: #27ae60;
         color: $color-game-title;
         text-shadow:
             1px 1px 0 $color-game-title-shadow,
-            2px 2px 0 $color-game-title-shadow,
-            3px 3px 0 $color-game-title-shadow,
-            4px 4px 0 $color-game-title-shadow,
-            5px 5px 0 $color-game-title-shadow;
-        padding:40px 10px;
+            2px 2px 0 $color-game-title-shadow;
+        padding: 40px 10px;
         border-radius: 5px;
         letter-spacing: 5px;
     }
@@ -56,58 +70,6 @@ $color-quit-btn-shadow: #27ae60;
         display: flex;
         gap: 10px;
         z-index: 10;
-
-        .hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .button-3d {
-            border: none;
-            margin: 10px;
-            padding: 10px 20px;
-            color: white;
-            font-size: 16px;
-            border-radius: 5px;
-            position: relative;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            outline: none;
-            text-shadow: 0px -1px 0px $color-game-title-shadow;
-            width: 100px;
-            text-align: center;
-
-            &:active {
-                left: 6px;
-                top: 6px;
-            }
-        }
-
-        .button-3d-pause {
-            background-color: $color-start-btn;
-            box-shadow:
-                6px 0px 0px $color-start-btn-shadow,
-                10px 0px 20px rgba($color-start-btn, 0.3);
-
-            &:active {
-                box-shadow:
-                    2px 0px 0px $color-start-btn-shadow,
-                    5px 0px 10px rgba($color-start-btn, 0.3);
-            }
-        }
-
-        .button-3d-start {
-            background-color: $color-quit-btn;
-            box-shadow:
-                6px 0px 0px $color-quit-btn-shadow,
-                10px 0px 20px rgba($color-quit-btn, 0.3);
-
-            &:active {
-                box-shadow:
-                    2px 0px 0px $color-quit-btn-shadow,
-                    5px 0px 10px rgba($color-quit-btn, 0.3);
-            }
-        }
     }
 }
 
@@ -127,7 +89,9 @@ $color-quit-btn-shadow: #27ae60;
     }
 
     .game-canvas-right {
-        width: 25%;
+        position: relative;
+        top: -55px;
+        width: 40%;
         height: 100%;
         background: $color-game-bg;
 
@@ -149,7 +113,7 @@ $color-quit-btn-shadow: #27ae60;
                 list-style-type: none;
                 padding-left: 0;
                 margin: 10px 0;
-                
+
                 li {
                     margin: 10px 0;
 
@@ -179,7 +143,6 @@ $color-quit-btn-shadow: #27ae60;
             text-align: center;
         }
     }
-
 }
 
 .game-over-container {
@@ -197,5 +160,67 @@ $color-quit-btn-shadow: #27ae60;
         font-size: 2em;
         color: #333;
         text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        text-align: center;
+    }
+}
+
+.mobile-buttons-group {
+    position: absolute;
+    bottom: 35px;
+
+    .mobile-button-row {
+        display: flex;
+        justify-content: center;
+        margin: 5px 0;
+        gap: 10px;
+    }
+
+    .button-3d {
+        width: 45px;
+        font-size: 12px;
+    }
+
+    .space-row {
+        .button-3d {
+            width: 100px;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .game-header {
+        gap: 0px;
+
+        .title-3d {
+            font-size: 2em;
+        }
+
+        .game-buttons-container {
+            position: relative;
+            left: -10px;
+            flex-direction: column;
+        }
+    }
+
+    .game-container {
+        .game-canvas-left {
+            transform: scale(0.85) !important;
+            width: 100% !important;
+            margin-left: 20px;
+        }
+
+        .game-canvas-right {
+            transform: scale(0.75) !important;
+            width: 100% !important;
+            top: 0;
+
+            .score-label {
+                margin-top: -25px;
+            }
+
+            .instructions-label {
+                margin-top: -35px;
+            }
+        }
     }
 }
