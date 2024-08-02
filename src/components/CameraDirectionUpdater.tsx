@@ -1,4 +1,4 @@
-import { useFrame, useThree } from "react-three-fiber";
+import { useFrame, useThree } from '@react-three/fiber'
 import { Vector3 } from "three";
 
 interface CameraDirectionUpdaterProps {

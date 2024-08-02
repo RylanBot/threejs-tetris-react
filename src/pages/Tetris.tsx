@@ -1,6 +1,6 @@
 import { Html, OrbitControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Vector3 } from 'three';
 
 import CameraDirectionUpdater from '@/components/CameraDirectionUpdater';
@@ -37,7 +37,6 @@ const Tetris: React.FC = () => {
         return initialState;
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const controlsRef = useRef<any>(null);
     const fallIntervalRef = useRef<number | undefined>();
 
@@ -185,7 +184,6 @@ const Tetris: React.FC = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
         if (isPaused || !position || !blocks) return;
 
-        // eslint-disable-next-line prefer-const
         let [x, y, z] = position;
         let newBlocks = blocks;
         const azimuthAngle = controlsRef.current?.getAzimuthalAngle() || 0;
@@ -250,10 +248,7 @@ const Tetris: React.FC = () => {
     const hardDrop = () => {
         if (gameOver || !position || !blocks || !type) return;
 
-        // eslint-disable-next-line prefer-const
         let [x, y, z] = position;
-
-        // eslint-disable-next-line no-constant-condition
         while (true) {
             const newY = y - 1;
             const predictedBlocksPosition = blocks.map(block => ({ x: block.x + x, y: block.y + newY, z: block.z + z }));

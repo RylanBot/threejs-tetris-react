@@ -10,6 +10,7 @@ interface TetriminoProps {
   blocks: Block[];
   scale?: number;
 }
+
 interface TetriminoDefinition {
   blocks: Block[];
   color: string;

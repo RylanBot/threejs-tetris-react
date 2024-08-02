@@ -1,6 +1,5 @@
 import { Block, TetriminoType, Tetriminos } from "@/components/Tetrimino";
 
-// eslint-disable-next-line prefer-const
 let bag: TetriminoType[] = [];
 
 /**

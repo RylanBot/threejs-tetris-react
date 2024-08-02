@@ -1,6 +1,6 @@
 import { Html } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { ArrowHelper, Color, Group, Vector3 } from 'three';
 
 /**
@@ -53,8 +53,6 @@ const MiniAxes: React.FC<MiniAxesProps> = ({ position = [0, 0, 0], cameraDirecti
         return () => {
             cleanupArrows();
         };
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [scene]);
 
     // 每一帧渲染时随着传入的方向一起旋转
