@@ -33,6 +33,7 @@ const ControlButton: React.FC<ButtonProps> = ({
   };
 
   const activeStyle = {
+    transform: 'translate(4px, 4px)',
     boxShadow: `2px 0px 0px ${shadowColor}, 5px 0px 10px rgba(${rgbBgColor}, 0.3)`,
   };
 

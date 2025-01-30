@@ -26,11 +26,6 @@ $color-game-title-shadow: #855575;
     text-shadow: 0px -1px 0px $color-game-title-shadow;
     width: 100px;
     text-align: center;
-
-    &:active {
-        left: 6px;
-        top: 6px;
-    }
 }
 
 .game-header {
