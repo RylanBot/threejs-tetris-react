@@ -1,12 +1,13 @@
-# threejs-tetris-react
+# 🕹️ threejs-tetris-react
 
-## Preview
+## 🌷 Preview
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Click%20to%20view-pink?style=for-the-badge&logo=vercel)](https://threejs-tetris-react.rylan.cn/)
 
-![react-3d-tetris.png](https://s2.loli.net/2023/10/08/vRb2pTY1SUHINVn.png)
+![Demo](./public/Demo.png)
 
-## Get Started
+## 🧙🏻 Development
 
-```bash
+```sh
 npm install
 npm run dev
 ```
