@@ -8,6 +8,9 @@ interface ButtonProps {
   style?: React.CSSProperties;
 }
 
+/**
+ * 立体按钮组件
+ */
 const ControlButton: React.FC<ButtonProps> = ({
   onClick,
   children,
@@ -17,6 +20,7 @@ const ControlButton: React.FC<ButtonProps> = ({
 }) => {
   const [isActive, setIsActive] = useState(false);
 
+  // rgba 转 rgb
   const rgbBgColor = bgColor
       .match(/^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i)
       ?.slice(1)

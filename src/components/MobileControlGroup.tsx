@@ -1,6 +1,9 @@
 import { simulateKeyPress } from "@/libs/keyboardUtils";
 import ControlButton from "./ControlButton";
 
+/**
+ * 移动端模拟键盘
+ */
 const MobileControlGroup = () => {
   if (
     !/Android|iPhone|iPad/i.test(navigator.userAgent) ||

@@ -18,6 +18,9 @@ interface TetriminoDefinition {
 
 export type TetriminoType = keyof typeof Tetriminos;
 
+/**
+ * 七种俄罗斯方块
+ */
 export const Tetriminos: { [key: string]: TetriminoDefinition } = {
   OrangeRicky: {
     blocks: [
@@ -84,6 +87,9 @@ export const Tetriminos: { [key: string]: TetriminoDefinition } = {
   }
 };
 
+/**
+ * 单独一个方块
+ */
 export const Cube: React.FC<{ position: Block; color: string }> = ({ position, color }) => {
   return (
     <group position={[position.x, position.y, position.z]}>
@@ -98,6 +104,9 @@ export const Cube: React.FC<{ position: Block; color: string }> = ({ position, c
   );
 };
 
+/**
+ * 所有方块构成的整体
+ */
 export const TetriminoSet: React.FC<TetriminoProps> = ({ type, position, blocks, scale = 1 }) => {
   const tetriminoColor = Tetriminos[type].color;
 
@@ -112,6 +121,9 @@ export const TetriminoSet: React.FC<TetriminoProps> = ({ type, position, blocks,
   );
 };
 
+/**
+ * 已经下落的方块集合
+ */
 export const FallenCubes: React.FC<{ gridState: (string | null)[][][] }> = ({ gridState }) => {
   const cubes = [];
 
