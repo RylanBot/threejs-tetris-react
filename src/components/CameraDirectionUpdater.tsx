@@ -5,9 +5,6 @@ interface CameraDirectionUpdaterProps {
     setDirection: (dir: Vector3) => void;
 }
 
-/**
- * 获取当前 Canvas 的相机角度
- */
 const CameraDirectionUpdater: React.FC<CameraDirectionUpdaterProps> = ({ setDirection }) => {
     const { camera } = useThree();
 

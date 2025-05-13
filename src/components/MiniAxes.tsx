@@ -3,9 +3,6 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import { ArrowHelper, Color, Group, Vector3 } from 'three';
 
-/**
- * 迷你坐标轴
- */
 interface MiniAxesProps {
     position?: [number, number, number];
     cameraDirection: Vector3;
@@ -32,11 +29,8 @@ const MiniAxes: React.FC<MiniAxesProps> = ({ position = [0, 0, 0], cameraDirecti
             groupRef.current.add(arrow);
         };
 
-        // 正负X轴
         createArrow(new Vector3(1, 0, 0), new Vector3(0, 0, 0), new Color(xColor));
         createArrow(new Vector3(-1, 0, 0), new Vector3(0, 0, 0), new Color(xColor));
-
-        // 正负Z轴
         createArrow(new Vector3(0, 0, 1), new Vector3(0, 0, 0), new Color(yColor));
         createArrow(new Vector3(0, 0, -1), new Vector3(0, 0, 0), new Color(yColor));
     };
@@ -55,7 +49,6 @@ const MiniAxes: React.FC<MiniAxesProps> = ({ position = [0, 0, 0], cameraDirecti
         };
     }, [scene]);
 
-    // 每一帧渲染时随着传入的方向一起旋转
     useFrame(() => {
         const azimuthalAngle = Math.atan2(cameraDirection.x, cameraDirection.z);
         groupRef.current.rotation.set(0, azimuthalAngle, 0);

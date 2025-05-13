@@ -18,6 +18,10 @@ const Tetris: React.FC = () => {
     const [blocks, setBlocks] = useState<Block[] | null>(null);
     const [nextType, setNextType] = useState<TetriminoType | null>(null);
     const [score, setScore] = useState(0);
+    const [highScore, setHighScore] = useState(() => {
+        const savedScore = localStorage.getItem('tetrisHighScore');
+        return savedScore ? parseInt(savedScore) : 0;
+    });
 
     const [gameOver, setGameOver] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
@@ -40,11 +44,11 @@ const Tetris: React.FC = () => {
     const controlsRef = useRef<any>(null);
     const fallIntervalRef = useRef<number | undefined>();
 
-    // 初始化新方块
+ 
     const generateNewTetrimino = () => {
         if (gameOver || !nextType) return;
 
-        setType(nextType); // 使用预测的方块作为当前方块
+        setType(nextType); 
 
         const newBlocks = rotateRandomly(Tetriminos[nextType].blocks);
         const newPosition = getRandomPosition(newBlocks);
@@ -53,11 +57,10 @@ const Tetris: React.FC = () => {
         setPosition(newPosition);
         startFall();
 
-        const newNextType = getRandomTetrimino(); // 预测下一个方块
+        const newNextType = getRandomTetrimino(); 
         setNextType(newNextType);
     };
 
-    // 开始游戏
     const startGame = () => {
         setGameStarted(true);
 
@@ -73,15 +76,22 @@ const Tetris: React.FC = () => {
         setIsPaused(false);
     };
 
-    // 结束游戏
+    
+    const handleGameEnd = () => {
+        if (score > highScore) {
+            setHighScore(score);
+            localStorage.setItem('tetrisHighScore', score.toString());
+        }
+        resetGame();
+    };
+
     const resetGame = () => {
         setType(null);
         setBlocks(null);
         setPosition(null);
         setNextType(null);
         setScore(0);
-
-        // 清空已落下的方块
+        
         setGridState(prevState => {
             const newState = [...prevState];
             for (let i = 0; i < 6; i++) {
@@ -96,18 +106,15 @@ const Tetris: React.FC = () => {
         setGameStarted(false);
         setGameOver(false);
 
-        // 停止方块下落
         if (fallIntervalRef.current) {
             clearInterval(fallIntervalRef.current);
         }
     };
 
-    // 暂停游戏
     const togglePause = () => {
         setIsPaused(prevIsPaused => !prevIsPaused);
     };
 
-    // 方块开始下落
     const startFall = () => {
         if (!position || !blocks || !type || isPaused || gameOver) return;
 
@@ -117,19 +124,18 @@ const Tetris: React.FC = () => {
 
         fallIntervalRef.current = setInterval(() => {
             const [x, y, z] = position;
-            const newY = y - 1;  // 预测的新位置
+            const newY = y - 1;
             const predictedBlocksPosition = blocks.map(block => ({ x: block.x + x, y: block.y + newY, z: block.z + z }));
 
             if (isValidPosition(predictedBlocksPosition)) {
-                setPosition([x, newY, z]);  // 如果预测的新位置有效，再更新
+                setPosition([x, newY, z]);
             } else {
-                addBlockToGrid(blocks.map(block => ({ x: block.x + x, y: block.y + y, z: block.z + z })), Tetriminos[type].color); // 使用当前位置
+                addBlockToGrid(blocks.map(block => ({ x: block.x + x, y: block.y + y, z: block.z + z })), Tetriminos[type].color);
                 generateNewTetrimino();
             }
         }, 1000) as unknown as number;
     };
 
-    // 限制方块运动边界
     const isValidPosition = (newBlocks: Block[]) => {
         for (let { x, y, z } of newBlocks) {
             x = Math.floor(x);
@@ -149,7 +155,6 @@ const Tetris: React.FC = () => {
         return true;
     };
 
-    // 添加当前方块到已下落的方块集合
     const addBlockToGrid = (blocksPosition: Block[], color: string) => {
         const newGridState = [...gridState];
 
@@ -161,7 +166,7 @@ const Tetris: React.FC = () => {
         }
         setGridState(newGridState);
 
-        setScore(prevScore => prevScore + 2);  // 成功下降就+2
+        setScore(prevScore => prevScore + 2);
 
         for (let y = 0; y < 12; y++) {
             if (isRowFull(y)) {
@@ -169,7 +174,6 @@ const Tetris: React.FC = () => {
             }
         }
 
-        // 检查顶层是否已满
         for (let x = 0; x < 6; x++) {
             for (let z = 0; z < 6; z++) {
                 if (newGridState[x][z][11] !== null) {
@@ -180,7 +184,6 @@ const Tetris: React.FC = () => {
         }
     };
 
-    // 操控位置移动
     const handleKeyDown = (e: KeyboardEvent) => {
         if (isPaused || !position || !blocks) return;
 
@@ -217,15 +220,12 @@ const Tetris: React.FC = () => {
                     z -= 1;
                 }
                 break;
-            // 沿x轴旋转
             case 'Q':
                 newBlocks = blocks.map(block => ({ x: block.x, y: block.z, z: -block.y }));
                 break;
-            // 沿y轴旋转
             case 'E':
                 newBlocks = blocks.map(block => ({ x: -block.z, y: block.y, z: block.x }));
                 break;
-            //沿z轴旋转
             case 'R':
                 newBlocks = blocks.map(block => ({ x: block.y, y: -block.x, z: block.z }));
                 break;
@@ -244,7 +244,6 @@ const Tetris: React.FC = () => {
         }
     };
 
-    // 硬降落（直接到达底部）
     const hardDrop = () => {
         if (gameOver || !position || !blocks || !type) return;
 
@@ -262,7 +261,6 @@ const Tetris: React.FC = () => {
         generateNewTetrimino();
     };
 
-    // 检查某一行是否已满
     const isRowFull = (y: number): boolean => {
         for (let x = 0; x < 6; x++) {
             for (let z = 0; z < 6; z++) {
@@ -274,7 +272,6 @@ const Tetris: React.FC = () => {
         return true;
     };
 
-    // 清空已满的一行
     const clearRow = (y: number) => {
         const newGridState = [...gridState];
         for (let i = y; i < 11; i++) {
@@ -314,9 +311,15 @@ const Tetris: React.FC = () => {
         };
     }, [position, blocks, gameStarted, isPaused]);
 
+    useEffect(() => {
+        if (gameOver && score > highScore) {
+            setHighScore(score);
+            localStorage.setItem('tetrisHighScore', score.toString());
+        }
+    }, [gameOver, score, highScore]);
+
     return (
         <>
-            {/* 页面标题 */}
             <div className="game-header">
                 <a href="https://github.com/RylanBot/threejs-tetris-react"
                     target="_blank"
@@ -328,7 +331,7 @@ const Tetris: React.FC = () => {
 
                 <div className='game-buttons-container'>
                     <ControlButton
-                        onClick={gameStarted ? resetGame : startGame}
+                        onClick={gameStarted ? handleGameEnd : startGame}
                         bgColor='#77c899'
                         shadowColor='#27ae60'
                     > 
@@ -346,7 +349,6 @@ const Tetris: React.FC = () => {
                 </div>
             </div>
 
-            {/* 游戏主体 */}
             <div className='game-container'>
                 {gameOver && (
                     <div className="game-over-container">
@@ -354,7 +356,6 @@ const Tetris: React.FC = () => {
                     </div>
                 )}
 
-                {/* 游戏内容 */}
                 <div className='game-canvas-left'>
                     <Canvas style={{ width: '100%', height: '100%' }}>
                         <ambientLight intensity={2} />
@@ -377,7 +378,7 @@ const Tetris: React.FC = () => {
                     </Canvas>
                 </div>
 
-                {/* 其余信息 */}
+            
                 <div className='game-canvas-right'>
                     <Canvas style={{ width: '100%', height: '100%' }}>
                         <ambientLight />
@@ -393,8 +394,11 @@ const Tetris: React.FC = () => {
                                     blocks={Tetriminos[nextType].blocks}
                                     scale={0.15} />
 
-                                <Html position={[-0.75, 0.75, 0]} className='score-label'>
-                                    <h2>Score: &nbsp; {score}</h2>
+                                <Html position={[-0.75, 0.75, 0]} className='score-container'>
+                                    <div style={{ display: 'flex', gap: '20px', color:"white" }}>
+                                        <h2>Score: {score}</h2>
+                                        <h2>High: {highScore}</h2>
+                                    </div>
                                 </Html>
                             </>
                         )}
