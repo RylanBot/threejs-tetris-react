@@ -22,10 +22,10 @@ const ControlButton: React.FC<ButtonProps> = ({
 
   // rgba 转 rgb
   const rgbBgColor = bgColor
-      .match(/^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i)
-      ?.slice(1)
-      .map((v) => parseInt(v, 16))
-      .join(",") || bgColor;
+    .match(/^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i)
+    ?.slice(1)
+    .map((v) => parseInt(v, 16))
+    .join(",") || bgColor;
 
   const defaultStyle = {
     backgroundColor: bgColor,

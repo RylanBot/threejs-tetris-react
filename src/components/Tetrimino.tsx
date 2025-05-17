@@ -2,44 +2,59 @@ import { Box } from '@react-three/drei';
 import React from 'react';
 import { BoxGeometry } from 'three';
 
-export type Block = { x: number; y: number; z: number };
+import type { ThreePosition } from '@/libs/common';
+
+export type Block = { x: number; y: number; z: number }
+
+export type TetroType = keyof typeof Tetriminos;
 
 interface TetriminoProps {
-  type: TetriminoType;
-  position: [number, number, number];
+  type: TetroType;
+  position: ThreePosition;
   blocks: Block[];
   scale?: number;
 }
 
-interface TetriminoDefinition {
+interface TetriminoDef {
   blocks: Block[];
   color: string;
 }
 
-export type TetriminoType = keyof typeof Tetriminos;
-
 /**
  * 七种俄罗斯方块
+ * - 最高一行的坐标 y = 0（对齐顶部）
  */
-export const Tetriminos: { [key: string]: TetriminoDefinition } = {
+export const Tetriminos: { [key: string]: TetriminoDef } = {
+  /*
+      □
+    □□□
+   */
   OrangeRicky: {
     blocks: [
-      { x: 0, y: 0, z: 0 },
       { x: 1, y: 0, z: 0 },
-      { x: -1, y: 0, z: 0 },
-      { x: 1, y: 1, z: 0 }
+      { x: 0, y: -1, z: 0 },
+      { x: 1, y: -1, z: 0 },
+      { x: -1, y: -1, z: 0 },
     ],
     color: '#ff9562',
   },
+  /*
+    □ 
+    □□□
+   */
   BlueRicky: {
     blocks: [
-      { x: 0, y: 0, z: 0 },
-      { x: 1, y: 0, z: 0 },
       { x: -1, y: 0, z: 0 },
-      { x: -1, y: 1, z: 0 }
+      { x: 0, y: -1, z: 0 },
+      { x: 1, y: -1, z: 0 },
+      { x: -1, y: -1, z: 0 },
     ],
     color: '#5eaeff',
   },
+  /*
+    □□
+     □□
+   */
   ClevelandZ: {
     blocks: [
       { x: 0, y: 0, z: 0 },
@@ -49,6 +64,10 @@ export const Tetriminos: { [key: string]: TetriminoDefinition } = {
     ],
     color: '#de5f75',
   },
+  /*
+     □□
+    □□
+   */
   RhodeIslandZ: {
     blocks: [
       { x: 0, y: 0, z: 0 },
@@ -58,6 +77,9 @@ export const Tetriminos: { [key: string]: TetriminoDefinition } = {
     ],
     color: '#79dd53',
   },
+  /*
+    □□□□
+   */
   Hero: {
     blocks: [
       { x: 0, y: 0, z: 0 },
@@ -67,15 +89,23 @@ export const Tetriminos: { [key: string]: TetriminoDefinition } = {
     ],
     color: '#3fdcd5',
   },
+  /*
+     □
+    □□□
+   */
   Teewee: {
     blocks: [
       { x: 0, y: 0, z: 0 },
-      { x: -1, y: 0, z: 0 },
-      { x: 1, y: 0, z: 0 },
-      { x: 0, y: 1, z: 0 }
+      { x: 0, y: -1, z: 0 },
+      { x: -1, y: -1, z: 0 },
+      { x: 1, y: -1, z: 0 },
     ],
     color: '#af60ff',
   },
+  /*
+    □□
+    □□
+   */
   Smashboy: {
     blocks: [
       { x: 0, y: 0, z: 0 },

@@ -96,7 +96,7 @@ $color-game-title-shadow: #855575;
 
         .score-label {
             display: flex;
-            gap: 45px;
+            gap: 85px;
 
             .score-item {
                 display: flex;
@@ -218,6 +218,7 @@ $color-game-title-shadow: #855575;
 
             .score-label {
                 margin-top: -25px;
+                gap: 35px;
             }
 
             .instructions-label {

@@ -1,4 +1,3 @@
-import { simulateKeyPress } from "@/libs/keyboardUtils";
 import ControlButton from "./ControlButton";
 
 /**
@@ -11,6 +10,16 @@ const MobileControlGroup = () => {
   ) {
     return null;
   }
+
+  const simulateKeyPress = (key: string) => {
+    return () => {
+      const event = new KeyboardEvent('keydown', {
+        key,
+        bubbles: true,
+      });
+      document.dispatchEvent(event);
+    };
+  };
 
   return (
     <div className="mobile-buttons-group">

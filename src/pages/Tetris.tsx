@@ -2,21 +2,19 @@ import { Html, OrbitControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { useEffect, useRef, useState } from 'react';
 import { Vector3 } from 'three';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
-import CameraDirectionUpdater from '@/components/CameraDirectionUpdater';
-import ControlButton from '@/components/ControlButton';
-import MiniAxes from '@/components/MiniAxes';
-import MobileControlGroup from '@/components/MobileControlGroup';
-import { Block, FallenCubes, TetriminoSet, TetriminoType, Tetriminos } from '@/components/Tetrimino';
-import ThreeSidedGrid from '@/components/ThreeSidedGrid';
+import { CameraDirectionUpdater, ControlButton, MiniAxes, MobileControlGroup, ThreeSidedGrid } from '@/components';
+import { Block, FallenCubes, Tetriminos, TetriminoSet, type TetroType } from '@/components/Tetrimino';
 
-import { getRandomPosition, getRandomTetrimino, HIGH_SCORE_KEY, rotateRandomly } from '@/libs/initUtils.ts';
+import { HIGH_SCORE_KEY, type ThreePosition } from '@/libs/common';
+import { getRandomPosition, getRandomTetrimino, rotateRandomly } from '@/libs/generator';
 
 const Tetris: React.FC = () => {
-    const [type, setType] = useState<TetriminoType | null>(null);
-    const [position, setPosition] = useState<[number, number, number] | null>(null);
+    const [currType, setCurrType] = useState<TetroType | null>(null);
+    const [nextType, setNextType] = useState<TetroType | null>(null);
+    const [position, setPosition] = useState<ThreePosition | null>(null);
     const [blocks, setBlocks] = useState<Block[] | null>(null);
-    const [nextType, setNextType] = useState<TetriminoType | null>(null);
     const [score, setScore] = useState(0);
     const [highScore, setHighScore] = useState(() => {
         const savedScore = localStorage.getItem(HIGH_SCORE_KEY);
@@ -41,14 +39,14 @@ const Tetris: React.FC = () => {
         return initialState;
     });
 
-    const controlsRef = useRef<any>(null);
+    const controlsRef = useRef<OrbitControlsImpl | null>(null);
     const fallIntervalRef = useRef<number | undefined>();
 
     // 初始化新方块
     const generateNewTetrimino = () => {
         if (gameOver || !nextType) return;
 
-        setType(nextType); // 使用预测的方块作为当前方块
+        setCurrType(nextType); // 使用预测的方块作为当前方块
 
         const newBlocks = rotateRandomly(Tetriminos[nextType].blocks);
         const newPosition = getRandomPosition(newBlocks);
@@ -69,7 +67,7 @@ const Tetris: React.FC = () => {
         const newBlocks = rotateRandomly(Tetriminos[newType].blocks);
         const newPosition = getRandomPosition(newBlocks);
 
-        setType(newType);
+        setCurrType(newType);
         setBlocks(newBlocks);
         setPosition(newPosition);
         setNextType(getRandomTetrimino());
@@ -79,7 +77,7 @@ const Tetris: React.FC = () => {
 
     // 结束游戏
     const resetGame = () => {
-        setType(null);
+        setCurrType(null);
         setBlocks(null);
         setPosition(null);
         setNextType(null);
@@ -121,7 +119,7 @@ const Tetris: React.FC = () => {
 
     // 方块开始下落
     const startFall = () => {
-        if (!position || !blocks || !type || isPaused || gameOver) return;
+        if (!position || !blocks || !currType || isPaused || gameOver) return;
 
         if (fallIntervalRef.current) {
             clearInterval(fallIntervalRef.current);
@@ -135,7 +133,7 @@ const Tetris: React.FC = () => {
             if (isValidPosition(predictedBlocksPosition)) {
                 setPosition([x, newY, z]);  // 如果预测的新位置有效，再更新
             } else {
-                addBlockToGrid(blocks.map(block => ({ x: block.x + x, y: block.y + y, z: block.z + z })), Tetriminos[type].color); // 使用当前位置
+                addBlockToGrid(blocks.map(block => ({ x: block.x + x, y: block.y + y, z: block.z + z })), Tetriminos[currType].color); // 使用当前位置
                 generateNewTetrimino();
             }
         }, 1000) as unknown as number;
@@ -258,7 +256,7 @@ const Tetris: React.FC = () => {
 
     // 硬降落（直接到达底部）
     const hardDrop = () => {
-        if (gameOver || !position || !blocks || !type) return;
+        if (gameOver || !position || !blocks || !currType) return;
 
         let [x, y, z] = position;
         while (true) {
@@ -270,7 +268,7 @@ const Tetris: React.FC = () => {
             y = newY;
         }
 
-        addBlockToGrid(blocks.map(block => ({ x: block.x + x, y: block.y + y, z: block.z + z })), Tetriminos[type].color);
+        addBlockToGrid(blocks.map(block => ({ x: block.x + x, y: block.y + y, z: block.z + z })), Tetriminos[currType].color);
         generateNewTetrimino();
     };
 
@@ -329,7 +327,7 @@ const Tetris: React.FC = () => {
     useEffect(() => {
         if (gameOver && score > highScore) {
             setHighScore(score);
-            localStorage.setItem('tetrisHighScore', score.toString());
+            localStorage.setItem(HIGH_SCORE_KEY, score.toString());
         }
     }, [gameOver, score, highScore]);
 
@@ -389,8 +387,8 @@ const Tetris: React.FC = () => {
                         <CameraDirectionUpdater setDirection={setCameraDirection} />
 
                         <ThreeSidedGrid />
-                        {type && position && blocks && (
-                            <TetriminoSet type={type} position={position} blocks={blocks} />
+                        {currType && position && blocks && (
+                            <TetriminoSet type={currType} position={position} blocks={blocks} />
                         )}
                         <FallenCubes gridState={gridState} />
                     </Canvas>
@@ -401,34 +399,36 @@ const Tetris: React.FC = () => {
                     <Canvas style={{ width: '100%', height: '100%' }}>
                         <ambientLight />
 
+                        {gameStarted &&
+                            <Html position={[-0.75, 1.55, 0]} className='score-label'>
+                                <div className="score-item">
+                                    <h2>Score</h2>
+                                    <h2>{score}</h2>
+                                </div>
+                                {highScore > 0 && (
+                                    <div className="score-item">
+                                        <h2>High</h2>
+                                        <h2>{highScore}</h2>
+                                    </div>
+                                )}
+                            </Html>
+                        }
+
                         {nextType && (
                             <>
-                                <Html position={[-0.75, 0.65, 0]}>
+                                <Html position={[-0.75, 0.75, 0]}>
                                     <h2>Next:</h2>
                                 </Html>
                                 <TetriminoSet
                                     type={nextType}
-                                    position={[0.55, 0.5, 0]}
+                                    position={[0.55, 0.65, 0]}
                                     blocks={Tetriminos[nextType].blocks}
                                     scale={0.15}
                                 />
                             </>
                         )}
 
-                        <Html position={[-0.75, 1.55, 0]} className='score-label'>
-                            <div className="score-item">
-                                <h2>Score</h2>
-                                <h2>{score}</h2>
-                            </div>
-                            {highScore > 0 && (
-                                <div className="score-item">
-                                    <h2>High</h2>
-                                    <h2>{highScore}</h2>
-                                </div>
-                            )}
-                        </Html>
-
-                        <Html position={[-0.85, 0.15, 0]} className='instructions-label'>
+                        <Html position={[-0.85, 0, 0]} className='instructions-label'>
                             <ul>
                                 <li><strong>Drag:</strong> <span>Mouse</span></li>
                                 <li><strong>Rotate:</strong>

@@ -3,14 +3,16 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import { ArrowHelper, Color, Group, Vector3 } from 'three';
 
-/**
- * 迷你坐标轴
- */
+import type { ThreePosition } from '@/libs/common';
+
 interface MiniAxesProps {
-    position?: [number, number, number];
+    position?: ThreePosition;
     cameraDirection: Vector3;
 }
 
+/**
+ * 迷你坐标轴
+ */
 const MiniAxes: React.FC<MiniAxesProps> = ({ position = [0, 0, 0], cameraDirection }) => {
     const { scene } = useThree();
     const groupRef = useRef<Group>(new Group());
