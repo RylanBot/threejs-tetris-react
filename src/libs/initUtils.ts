@@ -1,6 +1,8 @@
 import { Block, TetriminoType, Tetriminos } from "@/components/Tetrimino";
 
-let bag: TetriminoType[] = [];
+const bag: TetriminoType[] = [];
+
+export const HIGH_SCORE_KEY = "tetris_high_score";
 
 /**
  * 随机选择方块类型

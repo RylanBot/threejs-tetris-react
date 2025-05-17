@@ -90,13 +90,20 @@ $color-game-title-shadow: #855575;
         height: 100%;
         background: $color-game-bg;
 
-        .next-block-label {
-            color: white;
+        h2 {
+            color: white
         }
 
         .score-label {
-            color: white;
-            white-space: nowrap;
+            display: flex;
+            gap: 45px;
+
+            .score-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
         }
 
         .instructions-label {

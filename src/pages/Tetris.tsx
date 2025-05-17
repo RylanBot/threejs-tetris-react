@@ -10,7 +10,7 @@ import MobileControlGroup from '@/components/MobileControlGroup';
 import { Block, FallenCubes, TetriminoSet, TetriminoType, Tetriminos } from '@/components/Tetrimino';
 import ThreeSidedGrid from '@/components/ThreeSidedGrid';
 
-import { getRandomPosition, getRandomTetrimino, rotateRandomly } from '@/libs/initUtils.ts';
+import { getRandomPosition, getRandomTetrimino, HIGH_SCORE_KEY, rotateRandomly } from '@/libs/initUtils.ts';
 
 const Tetris: React.FC = () => {
     const [type, setType] = useState<TetriminoType | null>(null);
@@ -19,7 +19,7 @@ const Tetris: React.FC = () => {
     const [nextType, setNextType] = useState<TetriminoType | null>(null);
     const [score, setScore] = useState(0);
     const [highScore, setHighScore] = useState(() => {
-        const savedScore = localStorage.getItem('tetrisHighScore');
+        const savedScore = localStorage.getItem(HIGH_SCORE_KEY);
         return savedScore ? parseInt(savedScore) : 0;
     });
 
@@ -109,7 +109,7 @@ const Tetris: React.FC = () => {
     const handleGameEnd = () => {
         if (score > highScore) {
             setHighScore(score);
-            localStorage.setItem('tetrisHighScore', score.toString());
+            localStorage.setItem(HIGH_SCORE_KEY, score.toString());
         }
         resetGame();
     };
@@ -350,7 +350,7 @@ const Tetris: React.FC = () => {
                         onClick={gameStarted ? handleGameEnd : startGame}
                         bgColor='#77c899'
                         shadowColor='#27ae60'
-                    > 
+                    >
                         {gameStarted ? "Quit" : "Start"}
                     </ControlButton>
 
@@ -358,8 +358,8 @@ const Tetris: React.FC = () => {
                         onClick={togglePause}
                         bgColor='#d77469'
                         shadowColor='#c0392b'
-                        style = {{display: gameStarted && !gameOver ? 'block' : 'none'}}
-                    > 
+                        style={{ display: gameStarted && !gameOver ? 'block' : 'none' }}
+                    >
                         {isPaused ? "Continue" : "Pause"}
                     </ControlButton>
                 </div>
@@ -375,7 +375,7 @@ const Tetris: React.FC = () => {
 
                 {/* 游戏内容 */}
                 <div className='game-canvas-left'>
-                    <Canvas style={{ width: '100%', height: '100%' }}>
+                    <Canvas>
                         <ambientLight intensity={2} />
                         <OrbitControls
                             ref={controlsRef}
@@ -403,23 +403,31 @@ const Tetris: React.FC = () => {
 
                         {nextType && (
                             <>
-                                <Html position={[-0.75, 1.55, 0]} className='next-block-label'>
+                                <Html position={[-0.75, 0.65, 0]}>
                                     <h2>Next:</h2>
                                 </Html>
                                 <TetriminoSet
                                     type={nextType}
-                                    position={[0.55, 1.4, 0]}
+                                    position={[0.55, 0.5, 0]}
                                     blocks={Tetriminos[nextType].blocks}
-                                    scale={0.15} />
-
-                                <Html position={[-0.75, 0.75, 0]} className='score-container'>
-                                    <div style={{ display: 'flex', gap: '20px', color:"white" }}>
-                                        <h2>Score: {score}</h2>
-                                        <h2>High: {highScore}</h2>
-                                    </div>
-                                </Html>
+                                    scale={0.15}
+                                />
                             </>
                         )}
+
+                        <Html position={[-0.75, 1.55, 0]} className='score-label'>
+                            <div className="score-item">
+                                <h2>Score</h2>
+                                <h2>{score}</h2>
+                            </div>
+                            {highScore > 0 && (
+                                <div className="score-item">
+                                    <h2>High</h2>
+                                    <h2>{highScore}</h2>
+                                </div>
+                            )}
+                        </Html>
+
                         <Html position={[-0.85, 0.15, 0]} className='instructions-label'>
                             <ul>
                                 <li><strong>Drag:</strong> <span>Mouse</span></li>
@@ -433,11 +441,12 @@ const Tetris: React.FC = () => {
                                 <li><strong>Hard Drop:</strong> <span>Space</span></li>
                             </ul>
                         </Html>
+
                         <MiniAxes cameraDirection={cameraDirection} position={[0.25, -2.5, 0]} />
                     </Canvas>
                 </div>
 
-                <MobileControlGroup/>
+                <MobileControlGroup />
             </div>
         </>
     );
