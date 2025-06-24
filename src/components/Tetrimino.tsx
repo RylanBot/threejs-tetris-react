@@ -2,44 +2,59 @@ import { Box } from '@react-three/drei';
 import React from 'react';
 import { BoxGeometry } from 'three';
 
-export type Block = { x: number; y: number; z: number };
+import type { ThreePosition } from '@/libs/common';
+
+export type Block = { x: number; y: number; z: number }
+
+export type TetriminoType = 'OrangeRicky' | 'BlueRicky' | 'ClevelandZ' | 'RhodeIslandZ' | 'Hero' | 'Teewee' | 'Smashboy';
 
 interface TetriminoProps {
+  position: ThreePosition;
   type: TetriminoType;
-  position: [number, number, number];
   blocks: Block[];
   scale?: number;
 }
 
-interface TetriminoDefinition {
+interface TetriminoDef {
   blocks: Block[];
   color: string;
 }
 
-export type TetriminoType = keyof typeof Tetriminos;
-
 /**
  * 七种俄罗斯方块
+ * - 最高一行的坐标 y = 0（顶部对齐）
  */
-export const Tetriminos: { [key: string]: TetriminoDefinition } = {
+export const TETRIMINOS: Record<TetriminoType, TetriminoDef> = {
+  /*
+      □
+    □□□
+   */
   OrangeRicky: {
     blocks: [
-      { x: 0, y: 0, z: 0 },
       { x: 1, y: 0, z: 0 },
-      { x: -1, y: 0, z: 0 },
-      { x: 1, y: 1, z: 0 }
+      { x: 0, y: -1, z: 0 },
+      { x: 1, y: -1, z: 0 },
+      { x: -1, y: -1, z: 0 },
     ],
     color: '#ff9562',
   },
+  /*
+    □ 
+    □□□
+   */
   BlueRicky: {
     blocks: [
-      { x: 0, y: 0, z: 0 },
-      { x: 1, y: 0, z: 0 },
       { x: -1, y: 0, z: 0 },
-      { x: -1, y: 1, z: 0 }
+      { x: 0, y: -1, z: 0 },
+      { x: 1, y: -1, z: 0 },
+      { x: -1, y: -1, z: 0 },
     ],
     color: '#5eaeff',
   },
+  /*
+    □□
+     □□
+   */
   ClevelandZ: {
     blocks: [
       { x: 0, y: 0, z: 0 },
@@ -47,8 +62,12 @@ export const Tetriminos: { [key: string]: TetriminoDefinition } = {
       { x: 0, y: -1, z: 0 },
       { x: -1, y: -1, z: 0 }
     ],
-    color: '#de5f75',
+    color: '#ff8398',
   },
+  /*
+     □□
+    □□
+   */
   RhodeIslandZ: {
     blocks: [
       { x: 0, y: 0, z: 0 },
@@ -58,6 +77,9 @@ export const Tetriminos: { [key: string]: TetriminoDefinition } = {
     ],
     color: '#79dd53',
   },
+  /*
+    □□□□
+   */
   Hero: {
     blocks: [
       { x: 0, y: 0, z: 0 },
@@ -67,15 +89,23 @@ export const Tetriminos: { [key: string]: TetriminoDefinition } = {
     ],
     color: '#3fdcd5',
   },
+  /*
+     □
+    □□□
+   */
   Teewee: {
     blocks: [
       { x: 0, y: 0, z: 0 },
-      { x: -1, y: 0, z: 0 },
-      { x: 1, y: 0, z: 0 },
-      { x: 0, y: 1, z: 0 }
+      { x: 0, y: -1, z: 0 },
+      { x: -1, y: -1, z: 0 },
+      { x: 1, y: -1, z: 0 },
     ],
-    color: '#af60ff',
+    color: '#c183ff',
   },
+  /*
+    □□
+    □□
+   */
   Smashboy: {
     blocks: [
       { x: 0, y: 0, z: 0 },
@@ -90,52 +120,50 @@ export const Tetriminos: { [key: string]: TetriminoDefinition } = {
 /**
  * 单独一个方块
  */
-export const Cube: React.FC<{ position: Block; color: string }> = ({ position, color }) => {
+export const Tetrimino: React.FC<{ block: Block; color: string }> = React.memo(({ block, color }) => {
   return (
-    <group position={[position.x, position.y, position.z]}>
+    <group position={[block.x, block.y, block.z]}>
       <Box args={[1, 1, 1]}>
         <meshStandardMaterial color={color} />
       </Box>
       <lineSegments>
-        <edgesGeometry attach="geometry" args={[new BoxGeometry(1, 1, 1)]} />
-        <lineBasicMaterial attach="material" color="black" />
+        <edgesGeometry attach='geometry' args={[new BoxGeometry(1, 1, 1)]} />
+        <lineBasicMaterial attach='material' color='black' />
       </lineSegments>
     </group>
   );
-};
+});
 
 /**
  * 所有方块构成的整体
  */
-export const TetriminoSet: React.FC<TetriminoProps> = ({ type, position, blocks, scale = 1 }) => {
-  const tetriminoColor = Tetriminos[type].color;
-
+export const TetriminoGroup: React.FC<TetriminoProps> = React.memo(({ type, position, blocks, scale = 1 }) => {
+  const color = TETRIMINOS[type].color;
   return (
     <group position={position} scale={[scale, scale, scale]}>
       {blocks.map((block, index) => (
-        <Cube key={index} position={block} color={tetriminoColor} />
+        <Tetrimino key={index} block={block} color={color} />
       ))}
       <mesh receiveShadow position={[0, -0.1, 0]} visible={false}>
       </mesh>
     </group>
   );
-};
+});
 
 /**
  * 已经下落的方块集合
  */
-export const FallenCubes: React.FC<{ gridState: (string | null)[][][] }> = ({ gridState }) => {
-  const cubes = [];
-
-  for (let x = 0; x < gridState.length; x++) {
-    for (let z = 0; z < gridState[x].length; z++) {
-      for (let y = 0; y < gridState[x][z].length; y++) {
-        const color = gridState[x][z][y];
+export const TetriminoPile: React.FC<{ grid: (string | null)[][][] }> = React.memo(({ grid }) => {
+  const tetrimino = [];
+  for (let x = 0; x < grid.length; x++) {
+    for (let z = 0; z < grid[x].length; z++) {
+      for (let y = 0; y < grid[x][z].length; y++) {
+        const color = grid[x][z][y];
         if (color) {
-          cubes.push(
-            <Cube
+          tetrimino.push(
+            <Tetrimino
               key={`${x},${y},${z}`}
-              position={{ x: x + 0.5, y: y + 0.5, z: z + 0.5 }}
+              block={{ x: x + 0.5, y: y + 0.5, z: z + 0.5 }}
               color={color}
             />
           );
@@ -144,5 +172,5 @@ export const FallenCubes: React.FC<{ gridState: (string | null)[][][] }> = ({ gr
     }
   }
 
-  return <>{cubes}</>;
-};
+  return <>{tetrimino}</>;
+});

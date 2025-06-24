@@ -12,7 +12,8 @@
     "@react-three/fiber": "^8.16.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "three": "^0.157.0"
+    "three": "^0.157.0",
+    "three-stdlib": "^2.36.0"
   },
   "devDependencies": {
     "@types/node": "^20.12.7",
@@ -20,12 +21,7 @@
     "@types/react-dom": "^18.2.7",
     "@types/three": "^0.167.1",
     "@types/web": "^0.0.153",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react": "^4.0.3",
-    "eslint": "^8.45.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.3",
     "sass": "^1.69.0",
     "typescript": "^5.0.2",
     "vite": "^4.4.5"

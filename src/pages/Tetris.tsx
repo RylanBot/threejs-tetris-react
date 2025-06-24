@@ -1,31 +1,29 @@
-import { Html, OrbitControls } from '@react-three/drei';
-import { Canvas } from '@react-three/fiber';
 import { useEffect, useRef, useState } from 'react';
 import { Vector3 } from 'three';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
+import { Html, OrbitControls } from '@react-three/drei';
+import { Canvas } from '@react-three/fiber';
 
-import CameraDirectionUpdater from '@/components/CameraDirectionUpdater';
-import ControlButton from '@/components/ControlButton';
-import MiniAxes from '@/components/MiniAxes';
-import MobileControlGroup from '@/components/MobileControlGroup';
-import { Block, FallenCubes, TetriminoSet, TetriminoType, Tetriminos } from '@/components/Tetrimino';
-import ThreeSidedGrid from '@/components/ThreeSidedGrid';
+import { CameraDirectionUpdater, ControlButton, MiniAxes, MobileControlGroup, ThreeSidedGrid } from '@/components';
+import { Block, TetriminoGroup, TetriminoPile, TETRIMINOS, type TetriminoType } from '@/components/Tetrimino';
 
-import { getRandomPosition, getRandomTetrimino, HIGH_SCORE_KEY, rotateRandomly } from '@/libs/initUtils.ts';
+import { HIGH_SCORE_KEY, type ThreePosition } from '@/libs/common';
+import { applyRandomRotation, getRandomPosition, getRandomTetrimino } from '@/libs/generator';
 
 const Tetris: React.FC = () => {
-    const [type, setType] = useState<TetriminoType | null>(null);
-    const [position, setPosition] = useState<[number, number, number] | null>(null);
-    const [blocks, setBlocks] = useState<Block[] | null>(null);
+    const [currType, setCurrType] = useState<TetriminoType | null>(null);
     const [nextType, setNextType] = useState<TetriminoType | null>(null);
+    const [position, setPosition] = useState<ThreePosition | null>(null);
+    const [blocks, setBlocks] = useState<Block[] | null>(null);
     const [score, setScore] = useState(0);
     const [highScore, setHighScore] = useState(() => {
         const savedScore = localStorage.getItem(HIGH_SCORE_KEY);
         return savedScore ? parseInt(savedScore) : 0;
     });
 
-    const [gameOver, setGameOver] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
     const [gameStarted, setGameStarted] = useState(false);
+    const [gameOver, setGameOver] = useState(false);
 
     const [cameraDirection, setCameraDirection] = useState(new Vector3());
     const [gridState, setGridState] = useState<(string | null)[][][]>(() => {
@@ -41,16 +39,16 @@ const Tetris: React.FC = () => {
         return initialState;
     });
 
-    const controlsRef = useRef<any>(null);
+    const controlsRef = useRef<OrbitControlsImpl | null>(null);
     const fallIntervalRef = useRef<number | undefined>();
 
     // 初始化新方块
     const generateNewTetrimino = () => {
         if (gameOver || !nextType) return;
 
-        setType(nextType); // 使用预测的方块作为当前方块
+        setCurrType(nextType); // 使用预测的方块作为当前方块
 
-        const newBlocks = rotateRandomly(Tetriminos[nextType].blocks);
+        const newBlocks = applyRandomRotation(TETRIMINOS[nextType].blocks);
         const newPosition = getRandomPosition(newBlocks);
 
         setBlocks(newBlocks);
@@ -66,10 +64,10 @@ const Tetris: React.FC = () => {
         setGameStarted(true);
 
         const newType = getRandomTetrimino();
-        const newBlocks = rotateRandomly(Tetriminos[newType].blocks);
+        const newBlocks = applyRandomRotation(TETRIMINOS[newType].blocks);
         const newPosition = getRandomPosition(newBlocks);
 
-        setType(newType);
+        setCurrType(newType);
         setBlocks(newBlocks);
         setPosition(newPosition);
         setNextType(getRandomTetrimino());
@@ -79,7 +77,7 @@ const Tetris: React.FC = () => {
 
     // 结束游戏
     const resetGame = () => {
-        setType(null);
+        setCurrType(null);
         setBlocks(null);
         setPosition(null);
         setNextType(null);
@@ -121,7 +119,7 @@ const Tetris: React.FC = () => {
 
     // 方块开始下落
     const startFall = () => {
-        if (!position || !blocks || !type || isPaused || gameOver) return;
+        if (!position || !blocks || !currType || isPaused || gameOver) return;
 
         if (fallIntervalRef.current) {
             clearInterval(fallIntervalRef.current);
@@ -135,7 +133,7 @@ const Tetris: React.FC = () => {
             if (isValidPosition(predictedBlocksPosition)) {
                 setPosition([x, newY, z]);  // 如果预测的新位置有效，再更新
             } else {
-                addBlockToGrid(blocks.map(block => ({ x: block.x + x, y: block.y + y, z: block.z + z })), Tetriminos[type].color); // 使用当前位置
+                addBlockToGrid(blocks.map(block => ({ x: block.x + x, y: block.y + y, z: block.z + z })), TETRIMINOS[currType].color); // 使用当前位置
                 generateNewTetrimino();
             }
         }, 1000) as unknown as number;
@@ -173,7 +171,7 @@ const Tetris: React.FC = () => {
         }
         setGridState(newGridState);
 
-        setScore(prevScore => prevScore + 2);  // 成功下降就+2
+        setScore(prevScore => prevScore + 2);  // 成功下降就 +2
 
         for (let y = 0; y < 12; y++) {
             if (isRowFull(y)) {
@@ -258,7 +256,7 @@ const Tetris: React.FC = () => {
 
     // 硬降落（直接到达底部）
     const hardDrop = () => {
-        if (gameOver || !position || !blocks || !type) return;
+        if (gameOver || !position || !blocks || !currType) return;
 
         let [x, y, z] = position;
         while (true) {
@@ -270,7 +268,7 @@ const Tetris: React.FC = () => {
             y = newY;
         }
 
-        addBlockToGrid(blocks.map(block => ({ x: block.x + x, y: block.y + y, z: block.z + z })), Tetriminos[type].color);
+        addBlockToGrid(blocks.map(block => ({ x: block.x + x, y: block.y + y, z: block.z + z })), TETRIMINOS[currType].color);
         generateNewTetrimino();
     };
 
@@ -329,7 +327,7 @@ const Tetris: React.FC = () => {
     useEffect(() => {
         if (gameOver && score > highScore) {
             setHighScore(score);
-            localStorage.setItem('tetrisHighScore', score.toString());
+            localStorage.setItem(HIGH_SCORE_KEY, score.toString());
         }
     }, [gameOver, score, highScore]);
 
@@ -337,28 +335,31 @@ const Tetris: React.FC = () => {
         <>
             {/* 页面标题 */}
             <div className="game-header">
-                <a href="https://github.com/RylanBot/threejs-tetris-react"
+                <a
+                    className="github-logo"
+                    rel="noopener noreferrer"
                     target="_blank"
-                    rel="noopener noreferrer">
-                    <img src={'https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png'} alt="Project Repository" className="github-logo" />
+                    href="https://github.com/RylanBot/threejs-tetris-react"
+                >
+                    <img src="https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png" />
                 </a>
 
-                <h1 className='title-3d'>3D Tetris</h1>
+                <h1 className="title-3d">3D Tetris</h1>
 
-                <div className='game-buttons-container'>
+                <div className="game-buttons-container">
                     <ControlButton
+                        bgColor="#77c899"
+                        shadowColor="#27ae60"
                         onClick={gameStarted ? handleGameEnd : startGame}
-                        bgColor='#77c899'
-                        shadowColor='#27ae60'
                     >
                         {gameStarted ? "Quit" : "Start"}
                     </ControlButton>
 
                     <ControlButton
-                        onClick={togglePause}
-                        bgColor='#d77469'
-                        shadowColor='#c0392b'
                         style={{ display: gameStarted && !gameOver ? 'block' : 'none' }}
+                        bgColor="#d77469"
+                        shadowColor="#c0392b"
+                        onClick={togglePause}
                     >
                         {isPaused ? "Continue" : "Pause"}
                     </ControlButton>
@@ -366,7 +367,7 @@ const Tetris: React.FC = () => {
             </div>
 
             {/* 游戏主体 */}
-            <div className='game-container'>
+            <div className="game-container">
                 {gameOver && (
                     <div className="game-over-container">
                         <h1>Game Over</h1>
@@ -374,7 +375,7 @@ const Tetris: React.FC = () => {
                 )}
 
                 {/* 游戏内容 */}
-                <div className='game-canvas-left'>
+                <div className="game-canvas-left">
                     <Canvas>
                         <ambientLight intensity={2} />
                         <OrbitControls
@@ -386,63 +387,65 @@ const Tetris: React.FC = () => {
                             enabled={!isPaused}
                             enablePan={false}
                         />
-                        <CameraDirectionUpdater setDirection={setCameraDirection} />
+                        <CameraDirectionUpdater onChange={setCameraDirection} />
 
                         <ThreeSidedGrid />
-                        {type && position && blocks && (
-                            <TetriminoSet type={type} position={position} blocks={blocks} />
+                        {currType && position && blocks && (
+                            <TetriminoGroup position={position} type={currType} blocks={blocks} />
                         )}
-                        <FallenCubes gridState={gridState} />
+                        <TetriminoPile grid={gridState} />
                     </Canvas>
                 </div>
 
                 {/* 其余信息 */}
-                <div className='game-canvas-right'>
+                <div className="game-canvas-right">
                     <Canvas style={{ width: '100%', height: '100%' }}>
                         <ambientLight />
 
+                        {gameStarted &&
+                            <Html position={[-0.75, 1.6, 0]} className="score-label">
+                                <div className="score-item">
+                                    <h2>Score</h2>
+                                    <h2>{score}</h2>
+                                </div>
+                                {highScore > 0 && (
+                                    <div className="score-item">
+                                        <h2>High</h2>
+                                        <h2>{highScore}</h2>
+                                    </div>
+                                )}
+                            </Html>
+                        }
+
                         {nextType && (
                             <>
-                                <Html position={[-0.75, 0.65, 0]}>
-                                    <h2>Next:</h2>
+                                <Html position={[-0.75, 0.55, 0]}>
+                                    <h2>Next</h2>
                                 </Html>
-                                <TetriminoSet
+                                <TetriminoGroup
+                                    position={[0.5, 0.4, 0]}
                                     type={nextType}
-                                    position={[0.55, 0.5, 0]}
-                                    blocks={Tetriminos[nextType].blocks}
+                                    blocks={TETRIMINOS[nextType].blocks}
                                     scale={0.15}
                                 />
                             </>
                         )}
 
-                        <Html position={[-0.75, 1.55, 0]} className='score-label'>
-                            <div className="score-item">
-                                <h2>Score</h2>
-                                <h2>{score}</h2>
-                            </div>
-                            {highScore > 0 && (
-                                <div className="score-item">
-                                    <h2>High</h2>
-                                    <h2>{highScore}</h2>
-                                </div>
-                            )}
-                        </Html>
-
-                        <Html position={[-0.85, 0.15, 0]} className='instructions-label'>
+                        <Html position={[-0.85, -0.25, 0]} className='instructions-label'>
                             <ul>
                                 <li><strong>Drag:</strong> <span>Mouse</span></li>
                                 <li><strong>Rotate:</strong>
                                     <ul>
-                                        <li><strong>X-axis:</strong> Q</li>
-                                        <li><strong>Y-axis:</strong> E</li>
-                                        <li><strong>Z-axis:</strong> R</li>
+                                        <li><strong>X-axis:</strong> <span>Q</span></li>
+                                        <li><strong>Y-axis:</strong> <span>E</span></li>
+                                        <li><strong>Z-axis:</strong> <span>R</span></li>
                                     </ul>
                                 </li>
-                                <li><strong>Hard Drop:</strong> <span>Space</span></li>
+                                <li><strong>Drop:</strong> <span>Space</span></li>
                             </ul>
                         </Html>
 
-                        <MiniAxes cameraDirection={cameraDirection} position={[0.25, -2.5, 0]} />
+                        <MiniAxes position={[0, -2.75, 0]} direction={cameraDirection}/>
                     </Canvas>
                 </div>
 

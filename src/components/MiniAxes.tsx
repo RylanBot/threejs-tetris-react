@@ -1,17 +1,19 @@
-import { Html } from '@react-three/drei';
-import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import { ArrowHelper, Color, Group, Vector3 } from 'three';
+import { Html } from '@react-three/drei';
+import { useFrame, useThree } from '@react-three/fiber';
+
+import type { ThreePosition } from '@/libs/common';
+
+interface MiniAxesProps {
+    position?: ThreePosition;
+    direction: Vector3;
+}
 
 /**
  * 迷你坐标轴
  */
-interface MiniAxesProps {
-    position?: [number, number, number];
-    cameraDirection: Vector3;
-}
-
-const MiniAxes: React.FC<MiniAxesProps> = ({ position = [0, 0, 0], cameraDirection }) => {
+const MiniAxes: React.FC<MiniAxesProps> = ({ position = [0, 0, 0], direction }) => {
     const { scene } = useThree();
     const groupRef = useRef<Group>(new Group());
     const scaleValue = 0.4;
@@ -57,7 +59,7 @@ const MiniAxes: React.FC<MiniAxesProps> = ({ position = [0, 0, 0], cameraDirecti
 
     // 每一帧渲染时随着传入的方向一起旋转
     useFrame(() => {
-        const azimuthalAngle = Math.atan2(cameraDirection.x, cameraDirection.z);
+        const azimuthalAngle = Math.atan2(direction.x, direction.z);
         groupRef.current.rotation.set(0, azimuthalAngle, 0);
     });
 

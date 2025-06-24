@@ -1,11 +1,11 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState } from 'react';
 
 interface ButtonProps {
-  onClick: () => void;
   children: ReactNode;
   bgColor: string;
   shadowColor: string;
   style?: React.CSSProperties;
+  onClick: () => void;
 }
 
 /**
@@ -22,10 +22,10 @@ const ControlButton: React.FC<ButtonProps> = ({
 
   // rgba 转 rgb
   const rgbBgColor = bgColor
-      .match(/^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i)
-      ?.slice(1)
-      .map((v) => parseInt(v, 16))
-      .join(",") || bgColor;
+    .match(/^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i)
+    ?.slice(1)
+    .map((v) => parseInt(v, 16))
+    .join(",") || bgColor;
 
   const defaultStyle = {
     backgroundColor: bgColor,
@@ -40,6 +40,7 @@ const ControlButton: React.FC<ButtonProps> = ({
   return (
     <button
       className="button-3d"
+      style={{ ...defaultStyle, ...(isActive ? activeStyle : {}), ...style }}
       onClick={onClick}
       onMouseDown={() => setIsActive(true)}
       onMouseUp={() => setIsActive(false)}
@@ -47,7 +48,6 @@ const ControlButton: React.FC<ButtonProps> = ({
       onKeyDown={(event) => {
         if (event.key === " ") event.preventDefault();
       }}
-      style={{ ...defaultStyle, ...(isActive ? activeStyle : {}), ...style }}
     >
       {children}
     </button>

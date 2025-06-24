@@ -1,40 +1,41 @@
-import { Block, TetriminoType, Tetriminos } from "@/components/Tetrimino";
-
-const bag: TetriminoType[] = [];
-
-export const HIGH_SCORE_KEY = "tetris_high_score";
+import { Block, TETRIMINOS, type TetriminoType } from "@/components/Tetrimino";
+import type { ThreePosition } from "./common";
 
 /**
  * 随机选择方块类型
  * (Multi-bag Random Generator)
  */
-export function getRandomTetrimino(): TetriminoType {
-    const shuffleArray = (array: TetriminoType[]): TetriminoType[] => {
+export const getRandomTetrimino = (() => {
+    let bag: TetriminoType[] = [];
+
+    const shuffleArray = (array: TetriminoType[]) => {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [array[i], array[j]] = [array[j], array[i]];
         }
         return array;
-    }
+    };
+
     const fillBag = () => {
-        const tetriminos = Object.keys(Tetriminos) as TetriminoType[];
-        for (let i = 0; i < 3; i++) { // 每种方块三个
+        const tetriminos = Object.keys(TETRIMINOS) as TetriminoType[];
+        for (let i = 0; i < 3; i++) {
             bag.push(...tetriminos);
         }
         shuffleArray(bag);
-    }
+    };
 
-    if (bag.length === 0) {
-        fillBag();
-    }
-
-    return bag.pop()!;
-}
+    return function (): TetriminoType {
+        if (bag.length === 0) {
+            fillBag();
+        }
+        return bag.pop()!;
+    };
+})();
 
 /**
  * 随机旋转方块
  */
-export function rotateRandomly(blocks: Block[]): Block[] {
+export function applyRandomRotation(blocks: Block[]) {
     for (let i = 0; i < 5; i++) {
         const rotateTypes = Math.floor(Math.random() * 3);
         switch (rotateTypes) {
@@ -54,7 +55,7 @@ export function rotateRandomly(blocks: Block[]): Block[] {
 /**
  * 随机获取下落位置
  */
-export function getRandomPosition(rotatedBlocks: Block[]): [number, number, number] {
+export function getRandomPosition(rotatedBlocks: Block[]) {
     const getBounds = (blocks: Block[]) => {
         let minX = Infinity, maxX = -Infinity;
         let minY = Infinity, maxY = -Infinity;
@@ -81,5 +82,5 @@ export function getRandomPosition(rotatedBlocks: Block[]): [number, number, numb
     const y = 11.5 - bounds.maxY;
     const z = Math.floor(Math.random() * zRange) - bounds.minZ + 0.5;
 
-    return [x, y, z];
+    return [x, y, z] as ThreePosition;
 }

@@ -5,14 +5,15 @@ $color-game-title-shadow: #855575;
 * {
     margin: 0;
     padding: 0;
+    font-family: Georgia;
+    user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
-    user-select: none;
-    font-family: Georgia;
 }
 
 .button-3d {
+    cursor: pointer;
     border: none;
     margin: 10px;
     padding: 10px 20px;
@@ -21,7 +22,6 @@ $color-game-title-shadow: #855575;
     border-radius: 5px;
     position: relative;
     transition: all 0.3s ease;
-    cursor: pointer;
     outline: none;
     text-shadow: 0px -1px 0px $color-game-title-shadow;
     width: 100px;
@@ -42,10 +42,20 @@ $color-game-title-shadow: #855575;
 
     .github-logo {
         height: 45px;
+        width: 45px;
         margin: 0 10px;
-        box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+        box-shadow: 5px 5px 10px rgba(54, 51, 51, 0.5);
         border-radius: 50%;
-        background-color: #fff;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+            width: 115%;
+            height: 115%;
+            object-fit: cover;
+        }
     }
 
     .title-3d {
@@ -96,13 +106,13 @@ $color-game-title-shadow: #855575;
 
         .score-label {
             display: flex;
-            gap: 45px;
+            gap: 64px;
 
             .score-item {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                gap: 10px;
+                gap: 8px;
             }
         }
 
@@ -120,13 +130,12 @@ $color-game-title-shadow: #855575;
                     margin: 10px 0;
 
                     &>strong {
-                        font-weight: bold;
                         color: #ddd;
                     }
 
                     ul {
                         margin-top: 5px;
-                        padding-left: 20px;
+                        padding-left: 25px;
 
                         li {
                             font-size: 0.95em;
@@ -137,6 +146,7 @@ $color-game-title-shadow: #855575;
 
             span {
                 font-size: 1.1em;
+                margin-left: 5px;
             }
         }
 
@@ -157,11 +167,11 @@ $color-game-title-shadow: #855575;
     padding: 20px 40px;
     border-radius: 15px;
     box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+    font-style: italic;
 
     h1 {
         font-size: 2em;
         color: #333;
-        text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
         text-align: center;
     }
 }
@@ -218,6 +228,7 @@ $color-game-title-shadow: #855575;
 
             .score-label {
                 margin-top: -25px;
+                gap: 35px;
             }
 
             .instructions-label {
