@@ -135,6 +135,23 @@ export const Tetrimino: React.FC<{ block: Block; color: string }> = React.memo((
 });
 
 /**
+ * 幽灵方块（显示下落位置）
+ */
+export const GhostTetrimino: React.FC<{ block: Block; color: string }> = React.memo(({ block, color }) => {
+  return (
+    <group position={[block.x, block.y, block.z]}>
+      <Box args={[1, 1, 1]}>
+        <meshStandardMaterial color={color} transparent opacity={0.3} />
+      </Box>
+      <lineSegments>
+        <edgesGeometry attach='geometry' args={[new BoxGeometry(1, 1, 1)]} />
+        <lineBasicMaterial attach='material' color='black' transparent opacity={0.3} />
+      </lineSegments>
+    </group>
+  );
+});
+
+/**
  * 所有方块构成的整体
  */
 export const TetriminoGroup: React.FC<TetriminoProps> = React.memo(({ type, position, blocks, scale = 1 }) => {
@@ -146,6 +163,20 @@ export const TetriminoGroup: React.FC<TetriminoProps> = React.memo(({ type, posi
       ))}
       <mesh receiveShadow position={[0, -0.1, 0]} visible={false}>
       </mesh>
+    </group>
+  );
+});
+
+/**
+ * 幽灵方块组（显示下落位置）
+ */
+export const GhostTetriminoGroup: React.FC<TetriminoProps> = React.memo(({ type, position, blocks, scale = 1 }) => {
+  const color = TETRIMINOS[type].color;
+  return (
+    <group position={position} scale={[scale, scale, scale]}>
+      {blocks.map((block, index) => (
+        <GhostTetrimino key={index} block={block} color={color} />
+      ))}
     </group>
   );
 });

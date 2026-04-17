@@ -5,7 +5,7 @@ import { Html, OrbitControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 
 import { CameraDirectionUpdater, ControlButton, MiniAxes, MobileControlGroup, ThreeSidedGrid } from '@/components';
-import { Block, TetriminoGroup, TetriminoPile, TETRIMINOS, type TetriminoType } from '@/components/Tetrimino';
+import { Block, TetriminoGroup, TetriminoPile, GhostTetriminoGroup, TETRIMINOS, type TetriminoType } from '@/components/Tetrimino';
 
 import { HIGH_SCORE_KEY, type ThreePosition } from '@/libs/common';
 import { applyRandomRotation, getRandomPosition, getRandomTetrimino } from '@/libs/generator';
@@ -173,10 +173,10 @@ const Tetris: React.FC = () => {
 
         setScore(prevScore => prevScore + 2);  // 成功下降就 +2
 
-        for (let y = 0; y < 12; y++) {
-            if (isRowFull(y)) {
-                clearRow(y);
-            }
+        // 检查并清除所有填满的线
+        const linesToClear = getLinesToClear();
+        if (linesToClear.length > 0) {
+            clearLines(linesToClear);
         }
 
         // 检查顶层是否已满
@@ -254,6 +254,23 @@ const Tetris: React.FC = () => {
         }
     };
 
+    // 计算幽灵方块的位置（硬降落位置）
+    const getGhostPosition = (): ThreePosition | null => {
+        if (!position || !blocks) return null;
+
+        let [x, y, z] = position;
+        while (true) {
+            const newY = y - 1;
+            const predictedBlocksPosition = blocks.map(block => ({ x: block.x + x, y: block.y + newY, z: block.z + z }));
+            if (!isValidPosition(predictedBlocksPosition)) {
+                break;
+            }
+            y = newY;
+        }
+
+        return [x, y, z];
+    };
+
     // 硬降落（直接到达底部）
     const hardDrop = () => {
         if (gameOver || !position || !blocks || !currType) return;
@@ -272,35 +289,135 @@ const Tetris: React.FC = () => {
         generateNewTetrimino();
     };
 
-    // 检查某一行是否已满
-    const isRowFull = (y: number): boolean => {
+    // 检查沿X轴的线是否填满（固定y和z）
+    const isXLineFull = (y: number, z: number): boolean => {
         for (let x = 0; x < 6; x++) {
-            for (let z = 0; z < 6; z++) {
-                if (gridState[x][z][y] === null) {
-                    return false;
-                }
+            if (gridState[x][z][y] === null) {
+                return false;
             }
         }
         return true;
     };
 
-    // 清空已满的一行
-    const clearRow = (y: number) => {
-        const newGridState = [...gridState];
-        for (let i = y; i < 11; i++) {
-            for (let x = 0; x < 6; x++) {
-                for (let z = 0; z < 6; z++) {
-                    newGridState[x][z][i] = newGridState[x][z][i + 1];
+    // 检查沿Z轴的线是否填满（固定x和y）
+    const isZLineFull = (x: number, y: number): boolean => {
+        for (let z = 0; z < 6; z++) {
+            if (gridState[x][z][y] === null) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    // 检查沿Y轴的线是否填满（固定x和z）
+    const isYLineFull = (x: number, z: number): boolean => {
+        for (let y = 0; y < 12; y++) {
+            if (gridState[x][z][y] === null) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    // 获取所有需要清除的线
+    type LineType = 'x' | 'z' | 'y';
+    interface LineToClear {
+        type: LineType;
+        x?: number;
+        y?: number;
+        z?: number;
+    }
+
+    const getLinesToClear = (): LineToClear[] => {
+        const lines: LineToClear[] = [];
+        const clearedPositions = new Set<string>();
+
+        // 检查所有X轴线（固定y, z）
+        for (let y = 0; y < 12; y++) {
+            for (let z = 0; z < 6; z++) {
+                if (isXLineFull(y, z)) {
+                    lines.push({ type: 'x', y, z });
+                    for (let x = 0; x < 6; x++) {
+                        clearedPositions.add(`${x},${y},${z}`);
+                    }
                 }
             }
         }
+
+        // 检查所有Z轴线（固定x, y）
         for (let x = 0; x < 6; x++) {
-            for (let z = 0; z < 6; z++) {
-                newGridState[x][z][11] = null;
+            for (let y = 0; y < 12; y++) {
+                if (isZLineFull(x, y)) {
+                    lines.push({ type: 'z', x, y });
+                    for (let z = 0; z < 6; z++) {
+                        clearedPositions.add(`${x},${y},${z}`);
+                    }
+                }
             }
         }
+
+        // 检查所有Y轴线（固定x, z）
+        for (let x = 0; x < 6; x++) {
+            for (let z = 0; z < 6; z++) {
+                if (isYLineFull(x, z)) {
+                    lines.push({ type: 'y', x, z });
+                    for (let y = 0; y < 12; y++) {
+                        clearedPositions.add(`${x},${y},${z}`);
+                    }
+                }
+            }
+        }
+
+        return lines;
+    };
+
+    // 清除指定的线
+    const clearLines = (lines: LineToClear[]) => {
+        const newGridState = JSON.parse(JSON.stringify(gridState));
+        const positionsToClear = new Set<string>();
+
+        // 标记所有需要清除的位置
+        for (const line of lines) {
+            if (line.type === 'x' && line.y !== undefined && line.z !== undefined) {
+                for (let x = 0; x < 6; x++) {
+                    positionsToClear.add(`${x},${line.y},${line.z}`);
+                }
+            } else if (line.type === 'z' && line.x !== undefined && line.y !== undefined) {
+                for (let z = 0; z < 6; z++) {
+                    positionsToClear.add(`${line.x},${line.y},${z}`);
+                }
+            } else if (line.type === 'y' && line.x !== undefined && line.z !== undefined) {
+                for (let y = 0; y < 12; y++) {
+                    positionsToClear.add(`${line.x},${y},${line.z}`);
+                }
+            }
+        }
+
+        // 清除标记的位置
+        for (const pos of positionsToClear) {
+            const [x, y, z] = pos.split(',').map(Number);
+            newGridState[x][z][y] = null;
+        }
+
+        // 让上方的方块下落填充空隙
+        for (let x = 0; x < 6; x++) {
+            for (let z = 0; z < 6; z++) {
+                const column = [];
+                // 收集所有非空的方块
+                for (let y = 0; y < 12; y++) {
+                    if (newGridState[x][z][y] !== null) {
+                        column.push(newGridState[x][z][y]);
+                    }
+                }
+                // 从底部重新填充
+                for (let y = 0; y < 12; y++) {
+                    newGridState[x][z][y] = y < column.length ? column[y] : null;
+                }
+            }
+        }
+
         setGridState(newGridState);
-        setScore(prevScore => prevScore + 10);
+        setScore(prevScore => prevScore + lines.length * 10);
     };
 
     useEffect(() => {
@@ -391,7 +508,18 @@ const Tetris: React.FC = () => {
 
                         <ThreeSidedGrid />
                         {currType && position && blocks && (
-                            <TetriminoGroup position={position} type={currType} blocks={blocks} />
+                            <>
+                                <TetriminoGroup position={position} type={currType} blocks={blocks} />
+                                {(() => {
+                                    const ghostPos = getGhostPosition();
+                                    if (ghostPos && (ghostPos[1] !== position[1])) {
+                                        return (
+                                            <GhostTetriminoGroup position={ghostPos} type={currType} blocks={blocks} />
+                                        );
+                                    }
+                                    return null;
+                                })()}
+                            </>
                         )}
                         <TetriminoPile grid={gridState} />
                     </Canvas>
