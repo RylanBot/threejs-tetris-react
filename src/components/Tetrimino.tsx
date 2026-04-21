@@ -36,7 +36,7 @@ export const TETRIMINOS: Record<TetriminoType, TetriminoDef> = {
       { x: 1, y: -1, z: 0 },
       { x: -1, y: -1, z: 0 },
     ],
-    color: '#ff9562',
+    color: '#ffc2a8',
   },
   /*
     □ 
@@ -49,7 +49,7 @@ export const TETRIMINOS: Record<TetriminoType, TetriminoDef> = {
       { x: 1, y: -1, z: 0 },
       { x: -1, y: -1, z: 0 },
     ],
-    color: '#5eaeff',
+    color: '#aad4ff',
   },
   /*
     □□
@@ -62,7 +62,7 @@ export const TETRIMINOS: Record<TetriminoType, TetriminoDef> = {
       { x: 0, y: -1, z: 0 },
       { x: -1, y: -1, z: 0 }
     ],
-    color: '#ff8398',
+    color: '#ffb8c6',
   },
   /*
      □□
@@ -75,7 +75,7 @@ export const TETRIMINOS: Record<TetriminoType, TetriminoDef> = {
       { x: 0, y: -1, z: 0 },
       { x: 1, y: -1, z: 0 }
     ],
-    color: '#79dd53',
+    color: '#c8f4b6',
   },
   /*
     □□□□
@@ -87,7 +87,7 @@ export const TETRIMINOS: Record<TetriminoType, TetriminoDef> = {
       { x: 1, y: 0, z: 0 },
       { x: 2, y: 0, z: 0 }
     ],
-    color: '#3fdcd5',
+    color: '#b5e8e0',
   },
   /*
      □
@@ -100,7 +100,7 @@ export const TETRIMINOS: Record<TetriminoType, TetriminoDef> = {
       { x: -1, y: -1, z: 0 },
       { x: 1, y: -1, z: 0 },
     ],
-    color: '#c183ff',
+    color: '#e0c4ff',
   },
   /*
     □□
@@ -113,7 +113,7 @@ export const TETRIMINOS: Record<TetriminoType, TetriminoDef> = {
       { x: 0, y: -1, z: 0 },
       { x: 1, y: -1, z: 0 }
     ],
-    color: '#ffff4d',
+    color: '#fff4b5',
   }
 };
 

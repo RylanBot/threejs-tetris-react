@@ -485,57 +485,62 @@ const Tetris: React.FC = () => {
 
                 {/* 其余信息 */}
                 <div className="game-canvas-right">
-                    <Canvas style={{ width: '100%', height: '100%' }}>
-                        <color attach="background" args={['#1a1a2e']} />
-                        <ambientLight intensity={0.8} />
-                        <directionalLight position={[5, 5, 5]} intensity={1.2} />
-                        <pointLight position={[-5, 3, -5]} intensity={0.6} color="#88ccff" />
+                    <div className="right-panel-top">
+                        <div className="score-panel">
+                            <div className="score-item">
+                                <h3>SCORE</h3>
+                                <p>{score}</p>
+                            </div>
+                            <div className="score-item">
+                                <h3>HIGH</h3>
+                                <p>{highScore > 0 ? highScore : '-'}</p>
+                            </div>
+                        </div>
+                    </div>
 
-                        {gameStarted &&
-                            <Html position={[-0.75, 1.6, 0]} className="score-label">
-                                <div className="score-item">
-                                    <h2>Score</h2>
-                                    <h2>{score}</h2>
-                                </div>
-                                {highScore > 0 && (
-                                    <div className="score-item">
-                                        <h2>High</h2>
-                                        <h2>{highScore}</h2>
-                                    </div>
+                    <div className="next-block-panel">
+                        <h3>NEXT</h3>
+                        <div className="next-block-canvas">
+                            <Canvas>
+                                <color attach="background" args={['#1a1a2e']} />
+                                <ambientLight intensity={0.8} />
+                                <directionalLight position={[5, 5, 5]} intensity={1.2} />
+                                <pointLight position={[-5, 3, -5]} intensity={0.6} color="#88ccff" />
+                                {nextType ? (
+                                    <TetriminoGroup
+                                        position={[0.5, 0.5, 0]}
+                                        type={nextType}
+                                        blocks={TETRIMINOS[nextType].blocks}
+                                        scale={0.18}
+                                    />
+                                ) : (
+                                    <></>
                                 )}
-                            </Html>
-                        }
+                            </Canvas>
+                        </div>
+                    </div>
 
-                        {nextType && (
-                            <>
-                                <Html position={[-0.75, 0.55, 0]}>
-                                    <h2>Next</h2>
-                                </Html>
-                                <TetriminoGroup
-                                    position={[0.5, 0.4, 0]}
-                                    type={nextType}
-                                    blocks={TETRIMINOS[nextType].blocks}
-                                    scale={0.15}
-                                />
-                            </>
-                        )}
+                    <div className="instructions-panel">
+                        <h3>CONTROLS</h3>
+                        <ul>
+                            <li><strong>Drag</strong> <span>Mouse</span></li>
+                            <li><strong>Rotate X</strong> <span>Q</span></li>
+                            <li><strong>Rotate Y</strong> <span>E</span></li>
+                            <li><strong>Rotate Z</strong> <span>R</span></li>
+                            <li><strong>Drop</strong> <span>Space</span></li>
+                        </ul>
+                    </div>
 
-                        <Html position={[-0.85, -0.25, 0]} className='instructions-label'>
-                            <ul>
-                                <li><strong>Drag:</strong> <span>Mouse</span></li>
-                                <li><strong>Rotate:</strong>
-                                    <ul>
-                                        <li><strong>X-axis:</strong> <span>Q</span></li>
-                                        <li><strong>Y-axis:</strong> <span>E</span></li>
-                                        <li><strong>Z-axis:</strong> <span>R</span></li>
-                                    </ul>
-                                </li>
-                                <li><strong>Drop:</strong> <span>Space</span></li>
-                            </ul>
-                        </Html>
-
-                        <MiniAxes position={[0, -2.75, 0]} direction={cameraDirection}/>
-                    </Canvas>
+                    <div className="mini-axes-panel">
+                        <h3>DIRECTION</h3>
+                        <div className="mini-axes-canvas">
+                            <Canvas>
+                                <color attach="background" args={['#1a1a2e']} />
+                                <ambientLight intensity={0.5} />
+                                <MiniAxes position={[0, 0, 0]} direction={cameraDirection}/>
+                            </Canvas>
+                        </div>
+                    </div>
                 </div>
 
                 <MobileControlGroup />

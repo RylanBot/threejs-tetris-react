@@ -223,117 +223,183 @@ html, body, #root {
 .game-canvas-right {
     position: relative;
     flex: 1;
-    min-width: 0;
-    max-width: 400px;
+    min-width: 280px;
+    max-width: 380px;
     height: 100%;
-    padding: 15px;
     z-index: 2;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
 }
 
-.game-canvas-right h2 {
-    color: $color-text;
-    font-size: 1.3em;
-    font-weight: 600;
-    letter-spacing: 2px;
+.right-panel-top {
+    flex-shrink: 0;
 }
 
-.score-label {
+.score-panel {
     display: flex;
-    gap: 40px;
+    gap: 15px;
     justify-content: center;
 }
 
-.score-item {
+.score-panel .score-item {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
+    gap: 4px;
     background: $color-panel-bg;
-    padding: 15px 25px;
-    border-radius: 12px;
+    padding: 12px 15px;
+    border-radius: 10px;
     border: 1px solid $color-border;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    animation: float 3s ease-in-out infinite;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
 }
 
-.score-item:first-child {
-    animation-delay: 0s;
+.score-panel .score-item:hover {
+    border-color: $color-accent;
+    box-shadow: 0 4px 20px rgba(255, 107, 157, 0.2);
 }
 
-.score-item:last-child {
-    animation-delay: 1.5s;
-}
-
-.score-item h2:first-child {
-    font-size: 0.85em;
+.score-panel .score-item h3 {
+    font-size: 0.75em;
     color: $color-accent;
     text-transform: uppercase;
     letter-spacing: 2px;
     margin: 0;
+    font-weight: 600;
 }
 
-.score-item h2:last-child {
-    font-size: 2.2em;
+.score-panel .score-item p {
+    font-size: 1.8em;
     font-weight: 800;
     color: $color-score;
     text-shadow: 0 0 10px rgba(255, 217, 61, 0.5);
     margin: 0;
+    line-height: 1;
 }
 
-.instructions-label {
-    white-space: nowrap;
-    color: #888;
-    padding: 15px 20px;
+.next-block-panel {
+    flex: 0 0 auto;
     background: $color-panel-bg;
-    border-radius: 12px;
+    border-radius: 10px;
     border: 1px solid $color-border;
-    margin-top: 15px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    padding: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
-.instructions-label ul {
+.next-block-panel h3 {
+    font-size: 0.75em;
+    color: $color-accent;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0;
+    font-weight: 600;
+    text-align: center;
+}
+
+.next-block-canvas {
+    width: 100%;
+    height: 120px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: $color-game-bg;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.instructions-panel {
+    flex: 1;
+    background: $color-panel-bg;
+    border-radius: 10px;
+    border: 1px solid $color-border;
+    padding: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow: hidden;
+}
+
+.instructions-panel h3 {
+    font-size: 0.75em;
+    color: $color-accent;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.instructions-panel ul {
     list-style-type: none;
     padding-left: 0;
     margin: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow-y: auto;
 }
 
-.instructions-label ul li {
-    margin: 8px 0;
-    font-size: 0.9em;
-    line-height: 1.5;
+.instructions-panel ul li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 6px;
+    font-size: 0.85em;
+    color: $color-text;
 }
 
-.instructions-label ul li strong {
-    color: $color-accent;
+.instructions-panel ul li strong {
+    color: $color-text;
+    font-weight: 500;
+}
+
+.instructions-panel ul li span {
+    font-size: 0.85em;
+    color: $color-text;
+    background: rgba(255, 107, 157, 0.2);
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
     font-weight: 600;
 }
 
-.instructions-label ul li ul {
-    margin-top: 5px;
-    padding-left: 20px;
+.mini-axes-panel {
+    flex-shrink: 0;
+    background: $color-panel-bg;
+    border-radius: 10px;
+    border: 1px solid $color-border;
+    padding: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
-.instructions-label ul li ul li {
-    font-size: 0.9em;
-    color: #777;
-}
-
-.instructions-label span {
-    font-size: 1em;
-    margin-left: 5px;
-    color: $color-text;
-    background: rgba(255, 107, 157, 0.2);
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-family: 'Courier New', monospace;
-}
-
-.axis-label {
-    color: white;
+.mini-axes-panel h3 {
+    font-size: 0.75em;
+    color: $color-accent;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0;
+    font-weight: 600;
     text-align: center;
+}
+
+.mini-axes-canvas {
+    width: 100%;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: $color-game-bg;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .game-over-container {
