@@ -1,6 +1,6 @@
-import { Box } from '@react-three/drei';
-import React from 'react';
-import { BoxGeometry } from 'three';
+import { Box, Float, Sphere } from '@react-three/drei';
+import React, { useMemo } from 'react';
+import { BoxGeometry, Color, MeshPhysicalMaterial } from 'three';
 
 import type { ThreePosition } from '@/libs/common';
 
@@ -120,16 +120,42 @@ export const TETRIMINOS: Record<TetriminoType, TetriminoDef> = {
 /**
  * 单独一个方块
  */
-export const Tetrimino: React.FC<{ block: Block; color: string }> = React.memo(({ block, color }) => {
+export const Tetrimino: React.FC<{ block: Block; color: string; isClearing?: boolean }> = React.memo(({ block, color, isClearing = false }) => {
+  const emissiveColor = useMemo(() => {
+    const c = new Color(color);
+    return c.multiplyScalar(0.3);
+  }, [color]);
+
   return (
     <group position={[block.x, block.y, block.z]}>
-      <Box args={[1, 1, 1]}>
-        <meshStandardMaterial color={color} />
+      <Box args={[0.92, 0.92, 0.92]} castShadow receiveShadow>
+        <meshPhysicalMaterial
+          color={color}
+          metalness={0.3}
+          roughness={0.4}
+          clearcoat={0.8}
+          clearcoatRoughness={0.2}
+          emissive={emissiveColor}
+          emissiveIntensity={isClearing ? 2 : 0.3}
+        />
       </Box>
-      <lineSegments>
-        <edgesGeometry attach='geometry' args={[new BoxGeometry(1, 1, 1)]} />
-        <lineBasicMaterial attach='material' color='black' />
-      </lineSegments>
+      <Box args={[0.94, 0.94, 0.94]}>
+        <meshBasicMaterial
+          color={color}
+          wireframe
+          transparent
+          opacity={0.15}
+        />
+      </Box>
+      {isClearing && (
+        <Sphere args={[0.6, 16, 16]}>
+          <meshBasicMaterial
+            color={color}
+            transparent
+            opacity={0.6}
+          />
+        </Sphere>
+      )}
     </group>
   );
 });
@@ -153,18 +179,23 @@ export const TetriminoGroup: React.FC<TetriminoProps> = React.memo(({ type, posi
 /**
  * 已经下落的方块集合
  */
-export const TetriminoPile: React.FC<{ grid: (string | null)[][][] }> = React.memo(({ grid }) => {
+export const TetriminoPile: React.FC<{ 
+  grid: (string | null)[][][]; 
+  clearingRows?: number[];
+}> = React.memo(({ grid, clearingRows = [] }) => {
   const tetrimino = [];
   for (let x = 0; x < grid.length; x++) {
     for (let z = 0; z < grid[x].length; z++) {
       for (let y = 0; y < grid[x][z].length; y++) {
         const color = grid[x][z][y];
         if (color) {
+          const isClearing = clearingRows.includes(y);
           tetrimino.push(
             <Tetrimino
               key={`${x},${y},${z}`}
               block={{ x: x + 0.5, y: y + 0.5, z: z + 0.5 }}
               color={color}
+              isClearing={isClearing}
             />
           );
         }

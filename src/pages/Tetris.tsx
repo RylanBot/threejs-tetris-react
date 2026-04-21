@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Vector3 } from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
-import { Html, OrbitControls } from '@react-three/drei';
+import { Html, OrbitControls, ContactShadows } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 
 import { CameraDirectionUpdater, ControlButton, MiniAxes, MobileControlGroup, ThreeSidedGrid } from '@/components';
@@ -24,6 +24,8 @@ const Tetris: React.FC = () => {
     const [isPaused, setIsPaused] = useState(false);
     const [gameStarted, setGameStarted] = useState(false);
     const [gameOver, setGameOver] = useState(false);
+    const [isAnimating, setIsAnimating] = useState(false);
+    const [clearingRows, setClearingRows] = useState<number[]>([]);
 
     const [cameraDirection, setCameraDirection] = useState(new Vector3());
     const [gridState, setGridState] = useState<(string | null)[][][]>(() => {
@@ -173,26 +175,35 @@ const Tetris: React.FC = () => {
 
         setScore(prevScore => prevScore + 2);  // 成功下降就 +2
 
+        const fullRows: number[] = [];
         for (let y = 0; y < 12; y++) {
             if (isRowFull(y)) {
-                clearRow(y);
+                fullRows.push(y);
             }
         }
 
-        // 检查顶层是否已满
+        if (fullRows.length > 0) {
+            animateClearRows(fullRows);
+        } else {
+            checkGameOverAndGenerateNew(newGridState);
+        }
+    };
+
+    const checkGameOverAndGenerateNew = (currentGrid: (string | null)[][][]) => {
         for (let x = 0; x < 6; x++) {
             for (let z = 0; z < 6; z++) {
-                if (newGridState[x][z][11] !== null) {
+                if (currentGrid[x][z][11] !== null) {
                     setGameOver(true);
-                    break;
+                    return;
                 }
             }
         }
+        generateNewTetrimino();
     };
 
     // 操控位置移动
     const handleKeyDown = (e: KeyboardEvent) => {
-        if (isPaused || !position || !blocks) return;
+        if (isPaused || isAnimating || !position || !blocks) return;
 
         let [x, y, z] = position;
         let newBlocks = blocks;
@@ -284,23 +295,42 @@ const Tetris: React.FC = () => {
         return true;
     };
 
-    // 清空已满的一行
-    const clearRow = (y: number) => {
-        const newGridState = [...gridState];
-        for (let i = y; i < 11; i++) {
-            for (let x = 0; x < 6; x++) {
-                for (let z = 0; z < 6; z++) {
-                    newGridState[x][z][i] = newGridState[x][z][i + 1];
+    // 动画清除行
+    const animateClearRows = (rows: number[]) => {
+        setIsAnimating(true);
+        setClearingRows(rows);
+
+        setTimeout(() => {
+            const newGridState = [...gridState];
+            const sortedRows = [...rows].sort((a, b) => b - a);
+
+            for (const row of sortedRows) {
+                for (let i = row; i < 11; i++) {
+                    for (let x = 0; x < 6; x++) {
+                        for (let z = 0; z < 6; z++) {
+                            newGridState[x][z][i] = newGridState[x][z][i + 1];
+                        }
+                    }
+                }
+                for (let x = 0; x < 6; x++) {
+                    for (let z = 0; z < 6; z++) {
+                        newGridState[x][z][11] = null;
+                    }
                 }
             }
-        }
-        for (let x = 0; x < 6; x++) {
-            for (let z = 0; z < 6; z++) {
-                newGridState[x][z][11] = null;
-            }
-        }
-        setGridState(newGridState);
-        setScore(prevScore => prevScore + 10);
+
+            setGridState(newGridState);
+            setScore(prevScore => prevScore + 10 * rows.length);
+            setClearingRows([]);
+            setIsAnimating(false);
+
+            checkGameOverAndGenerateNew(newGridState);
+        }, 600);
+    };
+
+    // 清空已满的一行（保留兼容）
+    const clearRow = (y: number) => {
+        animateClearRows([y]);
     };
 
     useEffect(() => {
@@ -371,13 +401,60 @@ const Tetris: React.FC = () => {
                 {gameOver && (
                     <div className="game-over-container">
                         <h1>Game Over</h1>
+                        <p>Better luck next time!</p>
+                        <div className="game-over-score">
+                            <div className="score-item">
+                                <div className="label">Score</div>
+                                <div className="value">{score}</div>
+                            </div>
+                            <div className="score-item">
+                                <div className="label">High Score</div>
+                                <div className="value">{Math.max(score, highScore)}</div>
+                            </div>
+                        </div>
+                        <div className="game-over-buttons">
+                            <ControlButton
+                                bgColor="#77c899"
+                                shadowColor="#27ae60"
+                                onClick={startGame}
+                            >
+                                Retry
+                            </ControlButton>
+                        </div>
+                    </div>
+                )}
+
+                {isPaused && gameStarted && !gameOver && (
+                    <div className="paused-overlay">
+                        <h1>Paused</h1>
+                        <p>Press Continue to resume</p>
                     </div>
                 )}
 
                 {/* 游戏内容 */}
                 <div className="game-canvas-left">
-                    <Canvas>
-                        <ambientLight intensity={2} />
+                    <Canvas shadows camera={{ position: [15, 15, 15], fov: 50 }}>
+                        <color attach="background" args={['#1a1a2e']} />
+                        <fog attach="fog" args={['#1a1a2e', 20, 50]} />
+                        
+                        <ambientLight intensity={0.5} />
+                        <directionalLight
+                            position={[10, 20, 10]}
+                            intensity={1.5}
+                            castShadow
+                            shadow-mapSize={[2048, 2048]}
+                            shadow-camera-far={50}
+                            shadow-camera-left={-20}
+                            shadow-camera-right={20}
+                            shadow-camera-top={20}
+                            shadow-camera-bottom={-20}
+                        >
+                            <orthographicCamera attach="shadow-camera" args={[-20, 20, 20, -20]} />
+                        </directionalLight>
+                        <pointLight position={[-10, 10, -10]} intensity={0.8} color="#88ccff" />
+                        <pointLight position={[10, 5, 10]} intensity={0.5} color="#ffaa88" />
+                        <pointLight position={[-5, 15, 5]} intensity={0.4} color="#ffccaa" />
+                        
                         <OrbitControls
                             ref={controlsRef}
                             target={[2, 6, 0]}
@@ -393,14 +470,26 @@ const Tetris: React.FC = () => {
                         {currType && position && blocks && (
                             <TetriminoGroup position={position} type={currType} blocks={blocks} />
                         )}
-                        <TetriminoPile grid={gridState} />
+                        <TetriminoPile grid={gridState} clearingRows={clearingRows} />
+                        
+                        <ContactShadows
+                            position={[3, 0, 3]}
+                            opacity={0.5}
+                            scale={30}
+                            blur={2}
+                            far={10}
+                            color="#000000"
+                        />
                     </Canvas>
                 </div>
 
                 {/* 其余信息 */}
                 <div className="game-canvas-right">
                     <Canvas style={{ width: '100%', height: '100%' }}>
-                        <ambientLight />
+                        <color attach="background" args={['#1a1a2e']} />
+                        <ambientLight intensity={0.8} />
+                        <directionalLight position={[5, 5, 5]} intensity={1.2} />
+                        <pointLight position={[-5, 3, -5]} intensity={0.6} color="#88ccff" />
 
                         {gameStarted &&
                             <Html position={[-0.75, 1.6, 0]} className="score-label">
