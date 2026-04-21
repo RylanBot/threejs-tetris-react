@@ -501,7 +501,7 @@ const Tetris: React.FC = () => {
                     <div className="next-block-panel">
                         <h3>NEXT</h3>
                         <div className="next-block-canvas">
-                            <Canvas>
+                            <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
                                 <color attach="background" args={['#1a1a2e']} />
                                 <ambientLight intensity={0.8} />
                                 <directionalLight position={[5, 5, 5]} intensity={1.2} />
@@ -511,7 +511,7 @@ const Tetris: React.FC = () => {
                                         position={[0.5, 0.5, 0]}
                                         type={nextType}
                                         blocks={TETRIMINOS[nextType].blocks}
-                                        scale={0.18}
+                                        scale={0.55}
                                     />
                                 ) : (
                                     <></>
@@ -529,17 +529,6 @@ const Tetris: React.FC = () => {
                             <li><strong>Rotate Z</strong> <span>R</span></li>
                             <li><strong>Drop</strong> <span>Space</span></li>
                         </ul>
-                    </div>
-
-                    <div className="mini-axes-panel">
-                        <h3>DIRECTION</h3>
-                        <div className="mini-axes-canvas">
-                            <Canvas>
-                                <color attach="background" args={['#1a1a2e']} />
-                                <ambientLight intensity={0.5} />
-                                <MiniAxes position={[0, 0, 0]} direction={cameraDirection}/>
-                            </Canvas>
-                        </div>
                     </div>
                 </div>
 
