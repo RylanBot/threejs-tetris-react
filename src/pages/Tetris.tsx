@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { Vector3 } from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
-import { Html, OrbitControls } from '@react-three/drei';
-import { Canvas } from '@react-three/fiber';
+import { Html, OrbitControls, Environment, SoftShadows, BakeShadows, ContactShadows } from '@react-three/drei';
+import { Canvas, useFrame } from '@react-three/fiber';
 
-import { CameraDirectionUpdater, ControlButton, MiniAxes, MobileControlGroup, ThreeSidedGrid } from '@/components';
+import { CameraDirectionUpdater, ControlButton, MiniAxes, MobileControlGroup, ThreeSidedGrid, ExplosionParticles } from '@/components';
 import { Block, TetriminoGroup, TetriminoPile, TETRIMINOS, type TetriminoType } from '@/components/Tetrimino';
 
 import { HIGH_SCORE_KEY, type ThreePosition } from '@/libs/common';
@@ -38,6 +38,8 @@ const Tetris: React.FC = () => {
         }
         return initialState;
     });
+    
+    const [clearingRows, setClearingRows] = useState<Map<number, string>>(new Map());
 
     const controlsRef = useRef<OrbitControlsImpl | null>(null);
     const fallIntervalRef = useRef<number | undefined>();
@@ -173,10 +175,15 @@ const Tetris: React.FC = () => {
 
         setScore(prevScore => prevScore + 2);  // 成功下降就 +2
 
+        const fullRows: number[] = [];
         for (let y = 0; y < 12; y++) {
             if (isRowFull(y)) {
-                clearRow(y);
+                fullRows.push(y);
             }
+        }
+        
+        if (fullRows.length > 0) {
+            triggerRowClearing(fullRows);
         }
 
         // 检查顶层是否已满
@@ -284,8 +291,31 @@ const Tetris: React.FC = () => {
         return true;
     };
 
-    // 清空已满的一行
-    const clearRow = (y: number) => {
+    // 获取某一行的主要颜色
+    const getRowColor = (y: number): string => {
+        for (let x = 0; x < 6; x++) {
+            for (let z = 0; z < 6; z++) {
+                if (gridState[x][z][y] !== null) {
+                    return gridState[x][z][y]!;
+                }
+            }
+        }
+        return '#ffffff';
+    };
+
+    // 触发行消除的爆炸效果
+    const triggerRowClearing = (fullRows: number[]) => {
+        if (fullRows.length === 0) return;
+        
+        const newClearingRows = new Map<number, string>();
+        fullRows.forEach(y => {
+            newClearingRows.set(y, getRowColor(y));
+        });
+        setClearingRows(newClearingRows);
+    };
+
+    // 清空已满的一行（实际执行清除）
+    const performClearRow = (y: number) => {
         const newGridState = [...gridState];
         for (let i = y; i < 11; i++) {
             for (let x = 0; x < 6; x++) {
@@ -301,6 +331,33 @@ const Tetris: React.FC = () => {
         }
         setGridState(newGridState);
         setScore(prevScore => prevScore + 10);
+    };
+
+    // 处理爆炸效果完成
+    const handleExplosionComplete = (rowY: number) => {
+        setClearingRows(prev => {
+            const newMap = new Map(prev);
+            newMap.delete(rowY);
+            
+            if (newMap.size === 0) {
+                setTimeout(() => {
+                    const fullRows: number[] = [];
+                    for (let y = 0; y < 12; y++) {
+                        if (isRowFull(y)) {
+                            fullRows.push(y);
+                        }
+                    }
+                    
+                    if (fullRows.length > 0) {
+                        fullRows.sort((a, b) => b - a).forEach(y => {
+                            performClearRow(y);
+                        });
+                    }
+                }, 100);
+            }
+            
+            return newMap;
+        });
     };
 
     useEffect(() => {
@@ -371,17 +428,48 @@ const Tetris: React.FC = () => {
                 {gameOver && (
                     <div className="game-over-container">
                         <h1>Game Over</h1>
+                        <p className="game-over-score">Final Score</p>
+                        <p className="game-over-score-value">{score}</p>
+                        {score >= highScore && score > 0 && (
+                            <p className="new-high-score">✦ New High Score ✦</p>
+                        )}
+                    </div>
+                )}
+
+                {isPaused && gameStarted && !gameOver && (
+                    <div className="pause-overlay">
+                        <h2>Paused</h2>
+                        <p className="pause-hint">Press Pause button to continue</p>
                     </div>
                 )}
 
                 {/* 游戏内容 */}
                 <div className="game-canvas-left">
-                    <Canvas>
-                        <ambientLight intensity={2} />
+                    <Canvas shadows>
+                        <color attach="background" args={['#1a1a2e']} />
+                        <fog attach="fog" args={['#1a1a2e', 10, 50]} />
+                        <ambientLight intensity={0.5} />
+                        <directionalLight 
+                            position={[10, 20, 10]} 
+                            intensity={1.5} 
+                            castShadow 
+                            shadow-mapSize={[2048, 2048]}
+                            shadow-camera-far={50}
+                            shadow-camera-left={-20}
+                            shadow-camera-right={20}
+                            shadow-camera-top={20}
+                            shadow-camera-bottom={-20}
+                        />
+                        <pointLight position={[-10, 10, -10]} intensity={0.5} color="#ff9562" />
+                        <pointLight position={[10, 10, -10]} intensity={0.5} color="#5eaeff" />
+                        <spotLight position={[0, 25, 0]} intensity={1} angle={0.3} penumbra={1} castShadow />
+                        <Environment preset="city" background={false} />
+                        <SoftShadows size={10} samples={10} focus={0.5} />
+                        
                         <OrbitControls
                             ref={controlsRef}
                             target={[2, 6, 0]}
-                            minDistance={20} maxDistance={20}
+                            minDistance={15} maxDistance={30}
                             minPolarAngle={0} maxPolarAngle={Math.PI / 2}
                             minAzimuthAngle={0} maxAzimuthAngle={Math.PI / 2}
                             enabled={!isPaused}
@@ -394,6 +482,16 @@ const Tetris: React.FC = () => {
                             <TetriminoGroup position={position} type={currType} blocks={blocks} />
                         )}
                         <TetriminoPile grid={gridState} />
+                        
+                        {Array.from(clearingRows.entries()).map(([y, color]) => (
+                            <ExplosionParticles
+                                key={y}
+                                position={[2.5, y + 0.5, 2.5]}
+                                color={color}
+                                active={true}
+                                onComplete={() => handleExplosionComplete(y)}
+                            />
+                        ))}
                     </Canvas>
                 </div>
 
