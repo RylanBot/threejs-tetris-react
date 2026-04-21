@@ -362,7 +362,7 @@ const Tetris: React.FC = () => {
     }, [gameOver, score, highScore]);
 
     return (
-        <>
+        <div className="game-wrapper">
             {/* 页面标题 */}
             <div className="game-header">
                 <a
@@ -540,7 +540,7 @@ const Tetris: React.FC = () => {
 
                 <MobileControlGroup />
             </div>
-        </>
+        </div>
     );
 }
 
