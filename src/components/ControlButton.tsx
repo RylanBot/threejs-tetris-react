@@ -1,4 +1,6 @@
-import { ReactNode, useState } from 'react';
+import { useState } from 'react';
+
+import type { ReactNode } from 'react';
 
 interface ButtonProps {
   children: ReactNode;
@@ -11,21 +13,16 @@ interface ButtonProps {
 /**
  * 立体按钮组件
  */
-const ControlButton: React.FC<ButtonProps> = ({
-  onClick,
-  children,
-  bgColor,
-  shadowColor,
-  style,
-}) => {
+const ControlButton: React.FC<ButtonProps> = ({ onClick, children, bgColor, shadowColor, style }) => {
   const [isActive, setIsActive] = useState(false);
 
   // rgba 转 rgb
-  const rgbBgColor = bgColor
-    .match(/^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i)
-    ?.slice(1)
-    .map((v) => parseInt(v, 16))
-    .join(",") || bgColor;
+  const rgbBgColor =
+    bgColor
+      .match(/^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i)
+      ?.slice(1)
+      .map((v) => parseInt(v, 16))
+      .join(',') || bgColor;
 
   const defaultStyle = {
     backgroundColor: bgColor,
@@ -40,13 +37,17 @@ const ControlButton: React.FC<ButtonProps> = ({
   return (
     <button
       className="button-3d"
-      style={{ ...defaultStyle, ...(isActive ? activeStyle : {}), ...style }}
+      style={{
+        ...defaultStyle,
+        ...(isActive ? activeStyle : {}),
+        ...style,
+      }}
       onClick={onClick}
       onMouseDown={() => setIsActive(true)}
       onMouseUp={() => setIsActive(false)}
       onMouseLeave={() => setIsActive(false)}
       onKeyDown={(event) => {
-        if (event.key === " ") event.preventDefault();
+        if (event.key === ' ') event.preventDefault();
       }}
     >
       {children}

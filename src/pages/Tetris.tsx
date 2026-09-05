@@ -1,8 +1,8 @@
-import { Html, OrbitControls } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
-import { useEffect, useRef, useState } from "react";
-import { Vector3 } from "three";
-import { type OrbitControls as OrbitControlsImpl } from "three-stdlib";
+import { useEffect, useRef, useState } from 'react';
+
+import { Vector3 } from 'three';
+import { Html, OrbitControls } from '@react-three/drei';
+import { Canvas } from '@react-three/fiber';
 
 import {
   CameraDirectionUpdater,
@@ -10,26 +10,15 @@ import {
   MiniAxes,
   MobileControlGroup,
   NextPreviewCard,
-  ThreeSidedGrid
-} from "@/components";
-import {
-  Block,
-  TetriminoGroup,
-  TetriminoPile,
-  TETRIMINOS,
-  type TetriminoType
-} from "@/components/Tetrimino";
+  ThreeSidedGrid,
+} from '@/components';
+import { TetriminoGroup, TetriminoPile, TETRIMINOS } from '@/components/Tetrimino';
+import { HIGH_SCORE_KEY, isMobileDevice } from '@/libs/common';
+import { applyRandomRotation, getRandomPosition, getRandomTetrimino } from '@/libs/generator';
 
-import {
-  HIGH_SCORE_KEY,
-  isMobileDevice,
-  type ThreePosition
-} from "@/libs/common";
-import {
-  applyRandomRotation,
-  getRandomPosition,
-  getRandomTetrimino
-} from "@/libs/generator";
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
+import type { Block, TetriminoType } from '@/components/Tetrimino';
+import type { ThreePosition } from '@/libs/common';
 
 const Tetris: React.FC = () => {
   const [currType, setCurrType] = useState<TetriminoType | null>(null);
@@ -155,7 +144,7 @@ const Tetris: React.FC = () => {
       const predictedBlocksPosition = blocks.map((block) => ({
         x: block.x + x,
         y: block.y + newY,
-        z: block.z + z
+        z: block.z + z,
       }));
 
       if (isValidPosition(predictedBlocksPosition)) {
@@ -165,9 +154,9 @@ const Tetris: React.FC = () => {
           blocks.map((block) => ({
             x: block.x + x,
             y: block.y + y,
-            z: block.z + z
+            z: block.z + z,
           })),
-          TETRIMINOS[currType].color
+          TETRIMINOS[currType].color,
         ); // 使用当前位置
         generateNewTetrimino();
       }
@@ -181,15 +170,7 @@ const Tetris: React.FC = () => {
       y = Math.floor(y);
       z = Math.floor(z);
 
-      if (
-        x < 0 ||
-        x >= 6 ||
-        z < 0 ||
-        z >= 6 ||
-        y < 0 ||
-        y >= 12 ||
-        gridState[x][z][y] !== null
-      ) {
+      if (x < 0 || x >= 6 || z < 0 || z >= 6 || y < 0 || y >= 12 || gridState[x][z][y] !== null) {
         return false;
       }
     }
@@ -237,28 +218,28 @@ const Tetris: React.FC = () => {
     const azimuthAngle = controlsRef.current?.getAzimuthalAngle() || 0;
 
     switch (e.key.toUpperCase()) {
-      case "W":
+      case 'W':
         if (azimuthAngle >= 0 && azimuthAngle < Math.PI / 4) {
           z -= 1;
         } else {
           x -= 1;
         }
         break;
-      case "S":
+      case 'S':
         if (azimuthAngle >= 0 && azimuthAngle < Math.PI / 4) {
           z += 1;
         } else {
           x += 1;
         }
         break;
-      case "A":
+      case 'A':
         if (azimuthAngle >= 0 && azimuthAngle < Math.PI / 4) {
           x -= 1;
         } else {
           z += 1;
         }
         break;
-      case "D":
+      case 'D':
         if (azimuthAngle >= 0 && azimuthAngle < Math.PI / 4) {
           x += 1;
         } else {
@@ -266,30 +247,30 @@ const Tetris: React.FC = () => {
         }
         break;
       // 沿x轴旋转
-      case "Q":
+      case 'Q':
         newBlocks = blocks.map((block) => ({
           x: block.x,
           y: block.z,
-          z: -block.y
+          z: -block.y,
         }));
         break;
       // 沿y轴旋转
-      case "E":
+      case 'E':
         newBlocks = blocks.map((block) => ({
           x: -block.z,
           y: block.y,
-          z: block.x
+          z: block.x,
         }));
         break;
       //沿z轴旋转
-      case "R":
+      case 'R':
         newBlocks = blocks.map((block) => ({
           x: block.y,
           y: -block.x,
-          z: block.z
+          z: block.z,
         }));
         break;
-      case " ":
+      case ' ':
         hardDrop();
         return;
       default:
@@ -299,7 +280,7 @@ const Tetris: React.FC = () => {
     const newBlocksPosition = newBlocks.map((block) => ({
       x: block.x + x,
       y: block.y + y,
-      z: block.z + z
+      z: block.z + z,
     }));
     if (isValidPosition(newBlocksPosition)) {
       setPosition([x, y, z]);
@@ -318,7 +299,7 @@ const Tetris: React.FC = () => {
       const predictedBlocksPosition = blocks.map((block) => ({
         x: block.x + x,
         y: block.y + newY,
-        z: block.z + z
+        z: block.z + z,
       }));
       if (!isValidPosition(predictedBlocksPosition)) {
         break;
@@ -330,9 +311,9 @@ const Tetris: React.FC = () => {
       blocks.map((block) => ({
         x: block.x + x,
         y: block.y + y,
-        z: block.z + z
+        z: block.z + z,
       })),
-      TETRIMINOS[currType].color
+      TETRIMINOS[currType].color,
     );
     generateNewTetrimino();
   };
@@ -377,15 +358,15 @@ const Tetris: React.FC = () => {
 
     if (gameStarted && !isPaused) {
       startFall();
-      window.addEventListener("keydown", handleKeyDown);
+      window.addEventListener('keydown', handleKeyDown);
     } else {
       cleanupFall();
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener('keydown', handleKeyDown);
     }
 
     return () => {
       cleanupFall();
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener('keydown', handleKeyDown);
     };
   }, [position, blocks, gameStarted, isPaused]);
 
@@ -407,7 +388,12 @@ const Tetris: React.FC = () => {
             target="_blank"
             href="https://github.com/RylanBot/threejs-tetris-react"
           >
-            <img src="https://cdn.simpleicons.org/github" />
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+            >
+              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.79-.26.79-.58v-2.23c-3.34.73-4.03-1.42-4.03-1.42-.55-1.38-1.33-1.76-1.33-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.77.42-1.31.76-1.61-2.66-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.53-1.52.12-3.18 0 0 .98-.31 3.21 1.23a11.1 11.1 0 0 1 2.92-.39c.99.01 2.02.14 3.01.39 2.29-1.54 3.28-1.23 3.28-1.23.65 1.65.24 2.87.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.81 5.62-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.19.69.8.58C20.56 21.8 24 17.3 24 12 24 5.37 18.63 0 12 0Z" />
+            </svg>
           </a>
 
           <h1 className="title-3d">3D Tetris</h1>
@@ -419,16 +405,16 @@ const Tetris: React.FC = () => {
             shadowColor="#27ae60"
             onClick={gameStarted ? handleGameEnd : startGame}
           >
-            {gameStarted ? "Quit" : "Start"}
+            {gameStarted ? 'Quit' : 'Start'}
           </ControlButton>
 
           <ControlButton
-            style={{ display: gameStarted && !gameOver ? "block" : "none" }}
+            style={{ display: gameStarted && !gameOver ? 'block' : 'none' }}
             bgColor="#d77469"
             shadowColor="#c0392b"
             onClick={togglePause}
           >
-            {isPaused ? "Continue" : "Pause"}
+            {isPaused ? 'Continue' : 'Pause'}
           </ControlButton>
         </div>
       </div>
@@ -437,7 +423,7 @@ const Tetris: React.FC = () => {
       <div className="game-container">
         {gameOver && (
           <div className="game-over-container">
-            <h1>Game Over</h1>
+            <h1>GAME OVER</h1>
           </div>
         )}
 
@@ -473,11 +459,19 @@ const Tetris: React.FC = () => {
 
         {/* 其余信息 */}
         <div className="game-canvas-right">
-          <Canvas style={{ width: "100%", height: "100%" }}>
+          <Canvas
+            style={{
+              width: '100%',
+              height: '100%',
+            }}
+          >
             <ambientLight />
 
             {gameStarted && (
-              <Html position={[panelX, 1.6, 0]} className="score-label">
+              <Html
+                position={[panelX, 1.6, 0]}
+                className="score-label"
+              >
                 <div className="score-item">
                   <h2>Score</h2>
                   <h2>{score}</h2>
@@ -491,34 +485,37 @@ const Tetris: React.FC = () => {
               </Html>
             )}
 
-            {nextType && <NextPreviewCard type={nextType} positionX={panelX} />}
+            {nextType && (
+              <NextPreviewCard
+                type={nextType}
+                positionX={panelX}
+              />
+            )}
 
-            <Html position={[panelX, -0.4, 0]} className="instructions-label">
+            <Html
+              position={[panelX, -0.4, 0]}
+              className="instructions-label"
+            >
               <ul>
                 <li>
-                  <strong>Drag</strong>{" "}
-                  <span className="button-3d key-3d">Mouse</span>
+                  <strong>Drag</strong> <span className="button-3d key-3d">Mouse</span>
                 </li>
                 <li>
                   <strong>Rotate</strong>
                   <ul>
                     <li>
-                      <strong>X-axis</strong>{" "}
-                      <span className="button-3d key-3d">Q</span>
+                      <strong>X-axis</strong> <span className="button-3d key-3d">Q</span>
                     </li>
                     <li>
-                      <strong>Y-axis</strong>{" "}
-                      <span className="button-3d key-3d">E</span>
+                      <strong>Y-axis</strong> <span className="button-3d key-3d">E</span>
                     </li>
                     <li>
-                      <strong>Z-axis</strong>{" "}
-                      <span className="button-3d key-3d">R</span>
+                      <strong>Z-axis</strong> <span className="button-3d key-3d">R</span>
                     </li>
                   </ul>
                 </li>
                 <li>
-                  <strong>Drop</strong>{" "}
-                  <span className="button-3d key-3d">Space</span>
+                  <strong>Drop</strong> <span className="button-3d key-3d">Space</span>
                 </li>
               </ul>
             </Html>

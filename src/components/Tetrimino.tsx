@@ -1,12 +1,14 @@
-import { Box } from '@react-three/drei';
 import React from 'react';
+
 import { BoxGeometry } from 'three';
+import { Box } from '@react-three/drei';
 
 import type { ThreePosition } from '@/libs/common';
 
-export type Block = { x: number; y: number; z: number }
+export type Block = { x: number; y: number; z: number };
 
-export type TetriminoType = 'OrangeRicky' | 'BlueRicky' | 'ClevelandZ' | 'RhodeIslandZ' | 'Hero' | 'Teewee' | 'Smashboy';
+export type TetriminoType =
+  'OrangeRicky' | 'BlueRicky' | 'ClevelandZ' | 'RhodeIslandZ' | 'Hero' | 'Teewee' | 'Smashboy';
 
 interface TetriminoProps {
   position: ThreePosition;
@@ -31,10 +33,26 @@ export const TETRIMINOS: Record<TetriminoType, TetriminoDef> = {
    */
   OrangeRicky: {
     blocks: [
-      { x: 1, y: 0, z: 0 },
-      { x: 0, y: -1, z: 0 },
-      { x: 1, y: -1, z: 0 },
-      { x: -1, y: -1, z: 0 },
+      {
+        x: 1,
+        y: 0,
+        z: 0,
+      },
+      {
+        x: 0,
+        y: -1,
+        z: 0,
+      },
+      {
+        x: 1,
+        y: -1,
+        z: 0,
+      },
+      {
+        x: -1,
+        y: -1,
+        z: 0,
+      },
     ],
     color: '#ff9562',
   },
@@ -44,10 +62,26 @@ export const TETRIMINOS: Record<TetriminoType, TetriminoDef> = {
    */
   BlueRicky: {
     blocks: [
-      { x: -1, y: 0, z: 0 },
-      { x: 0, y: -1, z: 0 },
-      { x: 1, y: -1, z: 0 },
-      { x: -1, y: -1, z: 0 },
+      {
+        x: -1,
+        y: 0,
+        z: 0,
+      },
+      {
+        x: 0,
+        y: -1,
+        z: 0,
+      },
+      {
+        x: 1,
+        y: -1,
+        z: 0,
+      },
+      {
+        x: -1,
+        y: -1,
+        z: 0,
+      },
     ],
     color: '#5eaeff',
   },
@@ -57,10 +91,26 @@ export const TETRIMINOS: Record<TetriminoType, TetriminoDef> = {
    */
   ClevelandZ: {
     blocks: [
-      { x: 0, y: 0, z: 0 },
-      { x: 1, y: 0, z: 0 },
-      { x: 0, y: -1, z: 0 },
-      { x: -1, y: -1, z: 0 }
+      {
+        x: 0,
+        y: 0,
+        z: 0,
+      },
+      {
+        x: 1,
+        y: 0,
+        z: 0,
+      },
+      {
+        x: 0,
+        y: -1,
+        z: 0,
+      },
+      {
+        x: -1,
+        y: -1,
+        z: 0,
+      },
     ],
     color: '#ff8398',
   },
@@ -70,10 +120,26 @@ export const TETRIMINOS: Record<TetriminoType, TetriminoDef> = {
    */
   RhodeIslandZ: {
     blocks: [
-      { x: 0, y: 0, z: 0 },
-      { x: -1, y: 0, z: 0 },
-      { x: 0, y: -1, z: 0 },
-      { x: 1, y: -1, z: 0 }
+      {
+        x: 0,
+        y: 0,
+        z: 0,
+      },
+      {
+        x: -1,
+        y: 0,
+        z: 0,
+      },
+      {
+        x: 0,
+        y: -1,
+        z: 0,
+      },
+      {
+        x: 1,
+        y: -1,
+        z: 0,
+      },
     ],
     color: '#79dd53',
   },
@@ -82,10 +148,26 @@ export const TETRIMINOS: Record<TetriminoType, TetriminoDef> = {
    */
   Hero: {
     blocks: [
-      { x: 0, y: 0, z: 0 },
-      { x: -1, y: 0, z: 0 },
-      { x: 1, y: 0, z: 0 },
-      { x: 2, y: 0, z: 0 }
+      {
+        x: 0,
+        y: 0,
+        z: 0,
+      },
+      {
+        x: -1,
+        y: 0,
+        z: 0,
+      },
+      {
+        x: 1,
+        y: 0,
+        z: 0,
+      },
+      {
+        x: 2,
+        y: 0,
+        z: 0,
+      },
     ],
     color: '#3fdcd5',
   },
@@ -95,10 +177,26 @@ export const TETRIMINOS: Record<TetriminoType, TetriminoDef> = {
    */
   Teewee: {
     blocks: [
-      { x: 0, y: 0, z: 0 },
-      { x: 0, y: -1, z: 0 },
-      { x: -1, y: -1, z: 0 },
-      { x: 1, y: -1, z: 0 },
+      {
+        x: 0,
+        y: 0,
+        z: 0,
+      },
+      {
+        x: 0,
+        y: -1,
+        z: 0,
+      },
+      {
+        x: -1,
+        y: -1,
+        z: 0,
+      },
+      {
+        x: 1,
+        y: -1,
+        z: 0,
+      },
     ],
     color: '#c183ff',
   },
@@ -108,13 +206,29 @@ export const TETRIMINOS: Record<TetriminoType, TetriminoDef> = {
    */
   Smashboy: {
     blocks: [
-      { x: 0, y: 0, z: 0 },
-      { x: 1, y: 0, z: 0 },
-      { x: 0, y: -1, z: 0 },
-      { x: 1, y: -1, z: 0 }
+      {
+        x: 0,
+        y: 0,
+        z: 0,
+      },
+      {
+        x: 1,
+        y: 0,
+        z: 0,
+      },
+      {
+        x: 0,
+        y: -1,
+        z: 0,
+      },
+      {
+        x: 1,
+        y: -1,
+        z: 0,
+      },
     ],
     color: '#ffff4d',
-  }
+  },
 };
 
 /**
@@ -127,8 +241,14 @@ export const Tetrimino: React.FC<{ block: Block; color: string }> = React.memo((
         <meshStandardMaterial color={color} />
       </Box>
       <lineSegments>
-        <edgesGeometry attach='geometry' args={[new BoxGeometry(1, 1, 1)]} />
-        <lineBasicMaterial attach='material' color='black' />
+        <edgesGeometry
+          attach="geometry"
+          args={[new BoxGeometry(1, 1, 1)]}
+        />
+        <lineBasicMaterial
+          attach="material"
+          color="black"
+        />
       </lineSegments>
     </group>
   );
@@ -140,12 +260,22 @@ export const Tetrimino: React.FC<{ block: Block; color: string }> = React.memo((
 export const TetriminoGroup: React.FC<TetriminoProps> = React.memo(({ type, position, blocks, scale = 1 }) => {
   const color = TETRIMINOS[type].color;
   return (
-    <group position={position} scale={[scale, scale, scale]}>
+    <group
+      position={position}
+      scale={[scale, scale, scale]}
+    >
       {blocks.map((block, index) => (
-        <Tetrimino key={index} block={block} color={color} />
+        <Tetrimino
+          key={index}
+          block={block}
+          color={color}
+        />
       ))}
-      <mesh receiveShadow position={[0, -0.1, 0]} visible={false}>
-      </mesh>
+      <mesh
+        receiveShadow
+        position={[0, -0.1, 0]}
+        visible={false}
+      ></mesh>
     </group>
   );
 });
@@ -163,9 +293,13 @@ export const TetriminoPile: React.FC<{ grid: (string | null)[][][] }> = React.me
           tetrimino.push(
             <Tetrimino
               key={`${x},${y},${z}`}
-              block={{ x: x + 0.5, y: y + 0.5, z: z + 0.5 }}
+              block={{
+                x: x + 0.5,
+                y: y + 0.5,
+                z: z + 0.5,
+              }}
               color={color}
-            />
+            />,
           );
         }
       }
