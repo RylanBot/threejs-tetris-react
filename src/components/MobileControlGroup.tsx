@@ -1,15 +1,11 @@
+import { isMobileDevice } from '@/libs/common';
 import ControlButton from './ControlButton';
 
 /**
  * 移动端模拟键盘
  */
 const MobileControlGroup = () => {
-  if (
-    !/Android|iPhone|iPad/i.test(navigator.userAgent) ||
-    (navigator.maxTouchPoints > 1 && /Macintosh/i.test(navigator.userAgent))
-  ) {
-    return null;
-  }
+  if (!isMobileDevice()) return null;
 
   const simulateKeyPress = (key: string) => {
     return () => {

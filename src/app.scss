@@ -1,11 +1,33 @@
-$color-game-bg: #484954;
-$color-game-title: #ffc5e8;
-$color-game-title-shadow: #855575;
+:root {
+    --color-game-bg: #484954;
+    --color-game-title: #ffc5e8;
+    --color-game-title-shadow: #855575;
+    --radius-base: 5px;
+    --info-panel-bg: rgba(0, 0, 0, 0.28);
+    --info-panel-border: rgba(255, 255, 255, 0.08);
+    --info-panel-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    --info-card-width: 208px;
+}
+
+@mixin info-panel {
+    box-sizing: border-box;
+    width: var(--info-card-width);
+    background: var(--info-panel-bg);
+    border: 1px solid var(--info-panel-border);
+    border-radius: var(--radius-base);
+    box-shadow: var(--info-panel-shadow);
+}
+
+@mixin info-caption {
+    letter-spacing: 4px;
+    color: var(--color-game-title);
+    text-shadow: 1px 1px 0 var(--color-game-title-shadow);
+}
 
 * {
     margin: 0;
     padding: 0;
-    font-family: Georgia;
+    font-family: 'ProggyCleanTT', sans-serif;
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -19,11 +41,11 @@ $color-game-title-shadow: #855575;
     padding: 10px 20px;
     color: white;
     font-size: 16px;
-    border-radius: 5px;
+    border-radius: var(--radius-base);
     position: relative;
     transition: all 0.3s ease;
     outline: none;
-    text-shadow: 0px -1px 0px $color-game-title-shadow;
+    text-shadow: 0px -1px 0px var(--color-game-title-shadow);
     width: 100px;
     text-align: center;
 }
@@ -31,43 +53,58 @@ $color-game-title-shadow: #855575;
 .game-header {
     position: absolute;
     width: 100vw;
-    top: 20px;
+    top: 35px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 20px;
+    gap: 50px;
+
+    >div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
 
     .github-logo {
-        height: 45px;
-        width: 45px;
-        margin: 0 10px;
-        box-shadow: 5px 5px 10px rgba(54, 51, 51, 0.5);
-        border-radius: 50%;
+        width: 30px;
+        height: 30px;
         overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: center;
 
         img {
-            width: 115%;
-            height: 115%;
+            width: 100%;
+            height: 100%;
             object-fit: cover;
+            filter: invert(1);
         }
     }
 
     .title-3d {
+        position: relative;
+        top: 0.07em;
+        display: flex;
+        align-items: center;
         margin: 0;
+        padding: 0 10px;
         font-size: 3em;
-        color: $color-game-title;
+        color: var(--color-game-title);
         text-shadow:
-            1px 1px 0 $color-game-title-shadow,
-            2px 2px 0 $color-game-title-shadow;
-        padding: 40px 10px;
-        border-radius: 5px;
-        letter-spacing: 5px;
+            1px 1px 0 var(--color-game-title-shadow),
+            2px 2px 0 var(--color-game-title-shadow);
+        border-radius: var(--radius-base);
+        letter-spacing: 4px;
+    }
+
+    @supports not (text-box-trim: trim-both) {
+        .title-3d span {
+            transform: translateY(0.14em);
+        }
     }
 
     .game-buttons-container {
@@ -85,12 +122,12 @@ $color-game-title-shadow: #855575;
     justify-content: center;
     align-items: center;
     position: relative;
-    background: $color-game-bg;
+    background: var(--color-game-bg);
 
     .game-canvas-left {
         width: 40%;
         height: 100%;
-        background: $color-game-bg,
+        background: var(--color-game-bg);
     }
 
     .game-canvas-right {
@@ -98,55 +135,125 @@ $color-game-title-shadow: #855575;
         top: -55px;
         width: 40%;
         height: 100%;
-        background: $color-game-bg;
+        background: var(--color-game-bg);
 
         h2 {
             color: white
         }
 
         .score-label {
+            @include info-panel;
             display: flex;
-            gap: 64px;
+            align-items: stretch;
+            gap: 24px;
+            padding: 12px 20px;
 
             .score-item {
+                flex: 1;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
+                justify-content: center;
                 gap: 8px;
+
+                h2:first-child {
+                    @include info-caption;
+                    font-size: 1em;
+                }
+
+                h2:last-child {
+                    flex: 1;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.4em;
+                    color: #fff;
+                }
+            }
+
+            .score-item+.score-item {
+                padding-left: 24px;
+                border-left: 1px solid rgba(255, 255, 255, 0.12);
+            }
+        }
+
+        .next-label {
+            @include info-panel;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 8px 20px;
+
+            h2 {
+                @include info-caption;
+                font-size: 1.2em;
+                margin: 0;
+            }
+
+            .next-preview {
+                width: 88px;
+                height: 64px;
+                padding-left: 16px;
+                pointer-events: none;
+
+                canvas {
+                    display: block;
+                    width: 100% !important;
+                    height: 100% !important;
+                }
             }
         }
 
         .instructions-label {
+            @include info-panel;
             white-space: nowrap;
             color: #ababab;
-            padding: 10px;
+            padding: 12px 16px;
 
             ul {
                 list-style-type: none;
+                width: 100%;
                 padding-left: 0;
-                margin: 10px 0;
+                margin: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
 
                 li {
-                    margin: 10px 0;
+                    margin: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 16px;
+                    font-size: 0.9em;
+                    letter-spacing: 0.8px;
 
                     &>strong {
                         color: #ddd;
+                        font-weight: 600;
                     }
 
                     ul {
-                        margin-top: 5px;
-                        padding-left: 25px;
-
-                        li {
-                            font-size: 0.95em;
-                        }
+                        margin-top: 0;
+                        padding-left: 0;
+                        gap: 6px;
                     }
                 }
             }
 
-            span {
-                font-size: 1.1em;
-                margin-left: 5px;
+            .key-3d {
+                cursor: default;
+                width: auto;
+                min-width: 28px;
+                margin: 0;
+                padding: 4px 12px;
+                font-size: 12px;
+                color: var(--color-game-title);
+                background-color: rgba(255, 255, 255, 0.12);
+                box-shadow: 4px 0 0 #6a6b76, 6px 0 12px rgba(106, 107, 118, 0.35);
+                text-shadow: 0 -1px 0 var(--color-game-title-shadow);
             }
         }
 
@@ -165,7 +272,7 @@ $color-game-title-shadow: #855575;
     z-index: 11;
     background-color: rgba(255, 255, 255, 0.8);
     padding: 20px 40px;
-    border-radius: 15px;
+    border-radius: 10px;
     box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
     font-style: italic;
 
@@ -228,7 +335,11 @@ $color-game-title-shadow: #855575;
 
             .score-label {
                 margin-top: -25px;
-                gap: 35px;
+                gap: 16px;
+
+                .score-item+.score-item {
+                    padding-left: 16px;
+                }
             }
 
             .instructions-label {
