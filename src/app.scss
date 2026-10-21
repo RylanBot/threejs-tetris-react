@@ -34,6 +34,17 @@
   -ms-user-select: none;
 }
 
+html,
+body,
+#root {
+  background: var(--game-bg);
+}
+
+html.is-mobile,
+html.is-mobile body {
+  overflow: hidden;
+}
+
 .button-3d {
   cursor: pointer;
   border: none;
@@ -117,6 +128,7 @@
   display: flex;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   justify-content: center;
   align-items: center;
   position: relative;
@@ -286,7 +298,8 @@
 
 .mobile-buttons-group {
   position: absolute;
-  bottom: 35px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 12;
 
   .mobile-button-row {
     display: flex;
@@ -309,42 +322,170 @@
 
 @media (max-width: 768px) {
   .game-header {
-    gap: 0px;
+    top: max(12px, env(safe-area-inset-top, 0px));
+    gap: 12px;
+    padding: 0 8px;
+    box-sizing: border-box;
 
     .title-3d {
-      font-size: 2em;
+      font-size: 1.7em;
+      letter-spacing: 2px;
+      padding: 0 4px;
+    }
+
+    .github-logo svg {
+      width: 24px;
+      height: 24px;
     }
 
     .game-buttons-container {
       position: relative;
-      left: -10px;
-      flex-direction: column;
+      left: 0;
+      gap: 0;
+
+      .button-3d {
+        width: 72px;
+        margin: 6px;
+        padding: 8px 8px;
+        font-size: 14px;
+      }
     }
   }
 
   .game-container {
+    align-items: stretch;
+    gap: 0;
+    padding: 64px 8px calc(188px + env(safe-area-inset-bottom, 0px)) 4px;
+    box-sizing: border-box;
+
     .game-canvas-left {
-      transform: scale(0.85) !important;
-      width: 100% !important;
-      margin-left: 20px;
+      position: relative;
+      flex: 1 1 0;
+      width: auto !important;
+      height: auto;
+      min-width: 0;
+      min-height: 0;
+      margin-left: 0;
+      overflow: hidden;
+      transform: none !important;
+
+      >div {
+        height: 100%;
+      }
     }
 
     .game-canvas-right {
-      transform: scale(0.75) !important;
-      width: 100% !important;
+      position: relative;
       top: 0;
+      flex: 0 0 168px;
+      width: 168px !important;
+      max-width: 48%;
+      height: auto;
+      padding: 2px 6px 0 16px;
+      box-sizing: border-box;
+      overflow: hidden;
+      background: transparent;
+      transform: none !important;
+    }
+  }
 
-      .score-label {
-        margin-top: -25px;
-        gap: 16px;
+  .game-container .mobile-hud {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    height: 100%;
+    min-width: 0;
 
-        .score-item+.score-item {
-          padding-left: 16px;
-        }
+    .score-label,
+    .next-label,
+    .instructions-label {
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.22);
+    }
+
+    .score-label {
+      gap: 0;
+      padding: 8px 4px;
+
+      .score-item {
+        flex: 1 1 0;
+        min-width: 0;
+        align-items: center;
+        padding-left: 0;
       }
 
-      .instructions-label {
-        margin-top: -35px;
+      .score-item+.score-item {
+        padding-left: 0;
+        margin-left: 0;
+      }
+
+      .score-item h2:first-child {
+        width: 100%;
+        text-align: center;
+        font-size: 0.85em;
+        letter-spacing: 2px;
+        text-indent: 2px;
+      }
+
+      .score-item h2:last-child {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+    .next-label {
+      gap: 8px;
+      padding: 6px 10px;
+
+      h2 {
+        font-size: 0.95em;
+        letter-spacing: 3px;
+      }
+
+      .next-preview {
+        width: 64px;
+        height: 48px;
+        padding-left: 8px;
+      }
+    }
+
+    .instructions-label {
+      padding: 8px 10px;
+
+      ul {
+        gap: 6px;
+      }
+
+      ul li {
+        gap: 8px;
+      }
+
+      ul ul {
+        width: auto;
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+
+      .key-3d {
+        box-sizing: border-box;
+        flex: 0 0 48px;
+        width: 48px;
+        min-width: 48px;
+        padding: 3px 4px;
+        text-align: center;
+        box-shadow: 3px 0 0 #6a6b76;
+      }
+    }
+
+    .mobile-axes {
+      height: 128px;
+      margin-top: 4px;
+
+      canvas {
+        background: transparent !important;
       }
     }
   }

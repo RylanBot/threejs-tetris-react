@@ -9,21 +9,21 @@ import type { ThreePosition } from '@/libs/common';
 interface MiniAxesProps {
   position?: ThreePosition;
   direction: Vector3;
+  scale?: number;
 }
 
 /**
  * 迷你坐标轴
  */
-const MiniAxes: React.FC<MiniAxesProps> = ({ position = [0, 0, 0], direction }) => {
+const MiniAxes: React.FC<MiniAxesProps> = ({ position = [0, 0, 0], direction, scale = 0.4 }) => {
   const { scene } = useThree();
   const groupRef = useRef<Group>(new Group());
-  const scaleValue = 0.4;
   const axisLength = 2;
 
   const xColor = 'indianred';
   const yColor = 'forestgreen';
 
-  groupRef.current.scale.set(scaleValue, scaleValue, scaleValue);
+  groupRef.current.scale.set(scale, scale, scale);
   groupRef.current.position.set(...position);
 
   const setupArrows = () => {

@@ -31,41 +31,63 @@ const getPreviewLayout = (blocks: Block[]) => {
   };
 };
 
-const NextPreviewCard: React.FC<{ type: TetriminoType; positionX: number }> = ({ type, positionX }) => {
+const PreviewCanvas: React.FC<{ type: TetriminoType }> = ({ type }) => {
   const blocks = TETRIMINOS[type].blocks;
   const { scale, position } = getPreviewLayout(blocks);
 
   return (
-    <Html
-      position={[positionX, 0.65, 0]}
-      className="next-label"
+    <Canvas
+      camera={{
+        position: [1.6, 1.2, 3.6],
+        fov: 40,
+      }}
+      gl={{
+        alpha: true,
+        antialias: true,
+      }}
+      dpr={[1, 2]}
     >
+      <ambientLight intensity={1.6} />
+      <directionalLight
+        position={[2, 3, 4]}
+        intensity={0.85}
+      />
+      <TetriminoGroup
+        position={position}
+        type={type}
+        blocks={blocks}
+        scale={scale}
+      />
+    </Canvas>
+  );
+};
+
+const NextPreviewCard: React.FC<{
+  type: TetriminoType;
+  positionX?: number;
+  center?: boolean;
+  variant?: 'world' | 'dom';
+}> = ({ type, positionX = 0, center = false, variant = 'world' }) => {
+  const body = (
+    <>
       <h2>Next</h2>
       <div className="next-preview">
-        <Canvas
-          camera={{
-            position: [1.6, 1.2, 3.6],
-            fov: 40,
-          }}
-          gl={{
-            alpha: true,
-            antialias: true,
-          }}
-          dpr={[1, 2]}
-        >
-          <ambientLight intensity={1.6} />
-          <directionalLight
-            position={[2, 3, 4]}
-            intensity={0.85}
-          />
-          <TetriminoGroup
-            position={position}
-            type={type}
-            blocks={blocks}
-            scale={scale}
-          />
-        </Canvas>
+        <PreviewCanvas type={type} />
       </div>
+    </>
+  );
+
+  if (variant === 'dom') {
+    return <div className="next-label">{body}</div>;
+  }
+
+  return (
+    <Html
+      position={[positionX, 0.65, 0]}
+      center={center}
+      className="next-label"
+    >
+      {body}
     </Html>
   );
 };

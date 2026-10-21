@@ -7,9 +7,11 @@ import { Canvas } from '@react-three/fiber';
 import {
   CameraDirectionUpdater,
   ControlButton,
+  InstructionsList,
   MiniAxes,
   MobileControlGroup,
   NextPreviewCard,
+  PlayfieldCameraFitter,
   ThreeSidedGrid,
 } from '@/components';
 import { TetriminoGroup, TetriminoPile, TETRIMINOS } from '@/components/Tetrimino';
@@ -34,9 +36,13 @@ const Tetris: React.FC = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameOver, setGameOver] = useState(false);
+  const [narrow, setNarrow] = useState(() => (typeof window !== 'undefined' ? window.innerWidth <= 768 : false));
 
   const isMobile = isMobileDevice();
-  const panelX = isMobile ? -0.25 : -0.75;
+  const mobileLayout = isMobile && narrow;
+  const panelX = mobileLayout ? -0.25 : -0.75;
+  const axesPosition: ThreePosition = mobileLayout ? [0, -1.42, 0] : [panelX + 0.75, -2.75, 0];
+  const centerHud = mobileLayout;
 
   const [cameraDirection, setCameraDirection] = useState(new Vector3());
   const [gridState, setGridState] = useState<(string | null)[][][]>(() => {
@@ -371,6 +377,17 @@ const Tetris: React.FC = () => {
   }, [position, blocks, gameStarted, isPaused]);
 
   useEffect(() => {
+    document.documentElement.classList.toggle('is-mobile', isMobile);
+    return () => document.documentElement.classList.remove('is-mobile');
+  }, [isMobile]);
+
+  useEffect(() => {
+    const onResize = () => setNarrow(window.innerWidth <= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  useEffect(() => {
     if (gameOver && score > highScore) {
       setHighScore(score);
       localStorage.setItem(HIGH_SCORE_KEY, score.toString());
@@ -429,13 +446,23 @@ const Tetris: React.FC = () => {
 
         {/* 游戏内容 */}
         <div className="game-canvas-left">
-          <Canvas>
+          <Canvas
+            camera={
+              mobileLayout
+                ? {
+                    position: [14, 12, 14],
+                    fov: 46,
+                  }
+                : undefined
+            }
+          >
             <ambientLight intensity={2} />
             <OrbitControls
               ref={controlsRef}
-              target={[2, 6, 0]}
-              minDistance={20}
-              maxDistance={20}
+              makeDefault
+              target={mobileLayout ? [3, 5.5, 3] : [2, 6, 0]}
+              minDistance={mobileLayout ? 12 : 20}
+              maxDistance={mobileLayout ? 96 : 20}
               minPolarAngle={0}
               maxPolarAngle={Math.PI / 2}
               minAzimuthAngle={0}
@@ -443,6 +470,7 @@ const Tetris: React.FC = () => {
               enabled={!isPaused}
               enablePan={false}
             />
+            <PlayfieldCameraFitter narrow={mobileLayout} />
             <CameraDirectionUpdater onChange={setCameraDirection} />
 
             <ThreeSidedGrid />
@@ -459,75 +487,112 @@ const Tetris: React.FC = () => {
 
         {/* 其余信息 */}
         <div className="game-canvas-right">
-          <Canvas
-            style={{
-              width: '100%',
-              height: '100%',
-            }}
-          >
-            <ambientLight />
-
-            {gameStarted && (
-              <Html
-                position={[panelX, 1.6, 0]}
-                className="score-label"
-              >
-                <div className="score-item">
-                  <h2>Score</h2>
-                  <h2>{score}</h2>
-                </div>
-                {highScore > 0 && (
+          {centerHud ? (
+            <div className="mobile-hud">
+              {gameStarted && (
+                <div className="score-label">
                   <div className="score-item">
-                    <h2>High</h2>
-                    <h2>{highScore}</h2>
+                    <h2>Score</h2>
+                    <h2>{score}</h2>
                   </div>
-                )}
-              </Html>
-            )}
-
-            {nextType && (
-              <NextPreviewCard
-                type={nextType}
-                positionX={panelX}
-              />
-            )}
-
-            <Html
-              position={[panelX, -0.4, 0]}
-              className="instructions-label"
+                  {highScore > 0 && (
+                    <div className="score-item">
+                      <h2>High</h2>
+                      <h2>{highScore}</h2>
+                    </div>
+                  )}
+                </div>
+              )}
+              {nextType && (
+                <NextPreviewCard
+                  type={nextType}
+                  variant="dom"
+                />
+              )}
+              <div className="instructions-label">
+                <InstructionsList compact />
+              </div>
+              <div className="mobile-axes">
+                <Canvas
+                  camera={{
+                    position: [0, 2.6, 4.4],
+                    fov: 34,
+                  }}
+                  gl={{ alpha: true }}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    background: 'transparent',
+                    overflow: 'visible',
+                  }}
+                  onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
+                >
+                  <MiniAxes
+                    position={[0, 0, 0]}
+                    scale={0.72}
+                    direction={cameraDirection}
+                  />
+                </Canvas>
+              </div>
+            </div>
+          ) : (
+            <Canvas
+              style={{
+                width: '100%',
+                height: '100%',
+                overflow: 'visible',
+                background: 'transparent',
+              }}
+              gl={{ alpha: true }}
+              onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
             >
-              <ul>
-                <li>
-                  <strong>Drag</strong> <span className="button-3d key-3d">Mouse</span>
-                </li>
-                <li>
-                  <strong>Rotate</strong>
-                  <ul>
-                    <li>
-                      <strong>X-axis</strong> <span className="button-3d key-3d">Q</span>
-                    </li>
-                    <li>
-                      <strong>Y-axis</strong> <span className="button-3d key-3d">E</span>
-                    </li>
-                    <li>
-                      <strong>Z-axis</strong> <span className="button-3d key-3d">R</span>
-                    </li>
-                  </ul>
-                </li>
-                <li>
-                  <strong>Drop</strong> <span className="button-3d key-3d">Space</span>
-                </li>
-              </ul>
-            </Html>
+              <ambientLight />
 
-            <MiniAxes
-              position={[panelX + 0.75, -2.75, 0]}
-              direction={cameraDirection}
-            />
-          </Canvas>
+              {gameStarted && (
+                <Html
+                  position={[centerHud ? 0 : panelX, 1.6, 0]}
+                  center={centerHud}
+                  className="score-label"
+                >
+                  <div className="score-item">
+                    <h2>Score</h2>
+                    <h2>{score}</h2>
+                  </div>
+                  {highScore > 0 && (
+                    <div className="score-item">
+                      <h2>High</h2>
+                      <h2>{highScore}</h2>
+                    </div>
+                  )}
+                </Html>
+              )}
+
+              {nextType && (
+                <NextPreviewCard
+                  type={nextType}
+                  positionX={centerHud ? 0 : panelX}
+                  center={centerHud}
+                />
+              )}
+
+              <Html
+                position={[centerHud ? 0 : panelX, -0.4, 0]}
+                center={centerHud}
+                className="instructions-label"
+              >
+                <InstructionsList />
+              </Html>
+
+              <MiniAxes
+                position={axesPosition}
+                scale={0.4}
+                direction={cameraDirection}
+              />
+            </Canvas>
+          )}
         </div>
 
-        <MobileControlGroup />
+        {narrow && <MobileControlGroup />}
       </div>
     </>
   );
