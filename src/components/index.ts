@@ -1,5 +1,7 @@
 export { default as CameraDirectionUpdater } from './CameraDirectionUpdater';
+export { default as CameraViewportUpdater } from './CameraViewportUpdater';
 export { default as ControlButton } from './ControlButton';
+export { default as GameSideHud } from './GameSideHud';
 export { default as MiniAxes } from './MiniAxes';
 export { default as MobileControlGroup } from './MobileControlGroup';
 export { default as NextPreviewCard } from './NextPreviewCard';

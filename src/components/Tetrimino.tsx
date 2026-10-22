@@ -24,7 +24,7 @@ interface TetriminoDef {
 
 /**
  * 七种俄罗斯方块
- * - 最高一行的坐标 y = 0（顶部对齐）
+ *（最高一行的坐标 y = 0 用于顶部对齐）
  */
 export const TETRIMINOS: Record<TetriminoType, TetriminoDef> = {
   /*

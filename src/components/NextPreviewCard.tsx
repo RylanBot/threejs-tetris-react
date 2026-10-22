@@ -31,43 +31,53 @@ const getPreviewLayout = (blocks: Block[]) => {
   };
 };
 
-const NextPreviewCard: React.FC<{ type: TetriminoType; positionX: number }> = ({ type, positionX }) => {
+const PreviewCanvas: React.FC<{ type: TetriminoType }> = ({ type }) => {
   const blocks = TETRIMINOS[type].blocks;
   const { scale, position } = getPreviewLayout(blocks);
 
   return (
-    <Html
-      position={[positionX, 0.65, 0]}
-      className="next-label"
+    <Canvas
+      camera={{
+        position: [1.6, 1.2, 3.6],
+        fov: 40,
+      }}
+      gl={{
+        alpha: true,
+        antialias: true,
+      }}
+      dpr={[1, 2]}
     >
-      <h2>Next</h2>
-      <div className="next-preview">
-        <Canvas
-          camera={{
-            position: [1.6, 1.2, 3.6],
-            fov: 40,
-          }}
-          gl={{
-            alpha: true,
-            antialias: true,
-          }}
-          dpr={[1, 2]}
-        >
-          <ambientLight intensity={1.6} />
-          <directionalLight
-            position={[2, 3, 4]}
-            intensity={0.85}
-          />
-          <TetriminoGroup
-            position={position}
-            type={type}
-            blocks={blocks}
-            scale={scale}
-          />
-        </Canvas>
-      </div>
-    </Html>
+      <ambientLight intensity={1.6} />
+      <directionalLight
+        position={[2, 3, 4]}
+        intensity={0.85}
+      />
+      <TetriminoGroup
+        position={position}
+        type={type}
+        blocks={blocks}
+        scale={scale}
+      />
+    </Canvas>
   );
 };
+
+const NextPreviewCard: React.FC<{
+  type: TetriminoType;
+  positionX?: number;
+  positionY?: number;
+  center?: boolean;
+}> = ({ type, positionX = 0, positionY = 0.65, center = false }) => (
+  <Html
+    position={[positionX, positionY, 0]}
+    center={center}
+    className="next-label"
+  >
+    <h2>Next</h2>
+    <div className="next-preview">
+      <PreviewCanvas type={type} />
+    </div>
+  </Html>
+);
 
 export default NextPreviewCard;

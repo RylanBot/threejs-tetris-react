@@ -34,6 +34,17 @@
   -ms-user-select: none;
 }
 
+html,
+body,
+#root {
+  background: var(--game-bg);
+}
+
+html.is-mobile,
+html.is-mobile body {
+  overflow: hidden;
+}
+
 .button-3d {
   cursor: pointer;
   border: none;
@@ -117,6 +128,7 @@
   display: flex;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   justify-content: center;
   align-items: center;
   position: relative;
@@ -208,46 +220,51 @@
       @include info-panel;
       white-space: nowrap;
       color: #ababab;
-      padding: 12px 16px;
+      padding: 12px 20px 12px 16px;
 
-      ul {
+      .instruction-list {
         list-style-type: none;
         width: 100%;
         padding-left: 0;
         margin: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
+        display: grid;
+        grid-template-columns: max-content minmax(0, 1fr) max-content;
+        column-gap: 12px;
+        row-gap: 8px;
+        align-items: center;
+        font-size: 0.9em;
+        letter-spacing: 0.8px;
 
-        li {
-          margin: 0;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 16px;
-          font-size: 0.9em;
-          letter-spacing: 0.8px;
+        > li,
+        .instruction-pair {
+          display: contents;
+        }
 
-          &>strong {
-            color: #ddd;
-            font-weight: 600;
-          }
+        strong {
+          color: #ddd;
+          font-weight: 600;
+        }
 
-          ul {
-            margin-top: 0;
-            padding-left: 0;
-            gap: 6px;
-          }
+        .instruction-rotate {
+          grid-row: span 3;
+          align-self: center;
+        }
+
+        .instruction-axis {
+          justify-self: start;
         }
       }
 
       .key-3d {
         cursor: default;
+        box-sizing: border-box;
+        justify-self: stretch;
         width: auto;
         min-width: 28px;
         margin: 0;
         padding: 4px 12px;
         font-size: 12px;
+        text-align: center;
         color: var(--color-game-title);
         background-color: rgba(255, 255, 255, 0.12);
         box-shadow:
@@ -286,7 +303,8 @@
 
 .mobile-buttons-group {
   position: absolute;
-  bottom: 35px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 12;
 
   .mobile-button-row {
     display: flex;
@@ -309,42 +327,147 @@
 
 @media (max-width: 768px) {
   .game-header {
-    gap: 0px;
+    top: max(12px, env(safe-area-inset-top, 0px));
+    gap: 12px;
+    padding: 0 8px;
+    box-sizing: border-box;
 
     .title-3d {
-      font-size: 2em;
+      font-size: 1.7em;
+      letter-spacing: 2px;
+      padding: 0 4px;
+    }
+
+    .github-logo svg {
+      width: 24px;
+      height: 24px;
     }
 
     .game-buttons-container {
       position: relative;
-      left: -10px;
-      flex-direction: column;
+      left: 0;
+      gap: 0;
+
+      .button-3d {
+        width: 72px;
+        margin: 6px;
+        padding: 8px 8px;
+        font-size: 14px;
+      }
     }
   }
 
   .game-container {
+    align-items: stretch;
+    gap: 0;
+    padding: 64px 8px calc(188px + env(safe-area-inset-bottom, 0px)) 4px;
+    box-sizing: border-box;
+
     .game-canvas-left {
-      transform: scale(0.85) !important;
-      width: 100% !important;
-      margin-left: 20px;
+      position: relative;
+      flex: 1 1 0;
+      width: auto !important;
+      height: auto;
+      min-width: 0;
+      min-height: 0;
+      margin-left: 0;
+      overflow: hidden;
+      transform: none !important;
+
+      >div {
+        height: 100%;
+      }
     }
 
     .game-canvas-right {
-      transform: scale(0.75) !important;
-      width: 100% !important;
+      position: relative;
       top: 0;
+      flex: 0 0 168px;
+      width: 168px !important;
+      max-width: 48%;
+      height: auto;
+      padding: 2px 6px 0 16px;
+      box-sizing: border-box;
+      overflow: hidden;
+      background: transparent;
+      transform: none !important;
 
-      .score-label {
-        margin-top: -25px;
-        gap: 16px;
+      > div {
+        height: 100%;
+        min-height: 0;
+        container-type: inline-size;
+      }
+    }
 
-        .score-item+.score-item {
-          padding-left: 16px;
-        }
+    .score-label,
+    .next-label,
+    .instructions-label {
+      box-sizing: border-box;
+      width: 100cqi;
+      max-width: 100cqi;
+      margin: 0;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.22);
+    }
+
+    .score-label {
+      gap: 0;
+      padding: 8px 4px;
+
+      .score-item {
+        flex: 1 1 0;
+        min-width: 0;
+        align-items: center;
+        padding-left: 0;
       }
 
-      .instructions-label {
-        margin-top: -35px;
+      .score-item+.score-item {
+        padding-left: 0;
+        margin-left: 0;
+      }
+
+      .score-item h2:first-child {
+        width: 100%;
+        text-align: center;
+        font-size: 0.85em;
+        letter-spacing: 2px;
+        text-indent: 2px;
+      }
+
+      .score-item h2:last-child {
+        width: 100%;
+        text-align: center;
+      }
+    }
+
+    .game-canvas-right .next-label {
+      gap: 8px;
+      padding: 8px 12px;
+
+      h2 {
+        font-size: 0.95em;
+        letter-spacing: 2px;
+        text-indent: 2px;
+      }
+
+      .next-preview {
+        flex: 0 0 72px;
+        width: 72px;
+        height: 56px;
+        padding: 0;
+      }
+    }
+
+    .game-canvas-right .instructions-label {
+      padding: 8px 13px 8px 10px;
+
+      .instruction-list {
+        column-gap: 8px;
+        row-gap: 6px;
+      }
+
+      .key-3d {
+        padding: 3px 4px;
+        box-shadow: 3px 0 0 #6a6b76;
       }
     }
   }
