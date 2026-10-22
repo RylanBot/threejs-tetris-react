@@ -220,46 +220,51 @@ html.is-mobile body {
       @include info-panel;
       white-space: nowrap;
       color: #ababab;
-      padding: 12px 16px;
+      padding: 12px 20px 12px 16px;
 
-      ul {
+      .instruction-list {
         list-style-type: none;
         width: 100%;
         padding-left: 0;
         margin: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
+        display: grid;
+        grid-template-columns: max-content minmax(0, 1fr) max-content;
+        column-gap: 12px;
+        row-gap: 8px;
+        align-items: center;
+        font-size: 0.9em;
+        letter-spacing: 0.8px;
 
-        li {
-          margin: 0;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 16px;
-          font-size: 0.9em;
-          letter-spacing: 0.8px;
+        > li,
+        .instruction-pair {
+          display: contents;
+        }
 
-          &>strong {
-            color: #ddd;
-            font-weight: 600;
-          }
+        strong {
+          color: #ddd;
+          font-weight: 600;
+        }
 
-          ul {
-            margin-top: 0;
-            padding-left: 0;
-            gap: 6px;
-          }
+        .instruction-rotate {
+          grid-row: span 3;
+          align-self: center;
+        }
+
+        .instruction-axis {
+          justify-self: start;
         }
       }
 
       .key-3d {
         cursor: default;
+        box-sizing: border-box;
+        justify-self: stretch;
         width: auto;
         min-width: 28px;
         margin: 0;
         padding: 4px 12px;
         font-size: 12px;
+        text-align: center;
         color: var(--color-game-title);
         background-color: rgba(255, 255, 255, 0.12);
         box-shadow:
@@ -386,22 +391,20 @@ html.is-mobile body {
       overflow: hidden;
       background: transparent;
       transform: none !important;
-    }
-  }
 
-  .game-container .mobile-hud {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 8px;
-    height: 100%;
-    min-width: 0;
+      > div {
+        height: 100%;
+        min-height: 0;
+        container-type: inline-size;
+      }
+    }
 
     .score-label,
     .next-label,
     .instructions-label {
-      width: 100%;
-      max-width: 100%;
+      box-sizing: border-box;
+      width: 100cqi;
+      max-width: 100cqi;
       margin: 0;
       box-shadow: 0 6px 12px rgba(0, 0, 0, 0.22);
     }
@@ -436,56 +439,35 @@ html.is-mobile body {
       }
     }
 
-    .next-label {
+    .game-canvas-right .next-label {
       gap: 8px;
-      padding: 6px 10px;
+      padding: 8px 12px;
 
       h2 {
         font-size: 0.95em;
-        letter-spacing: 3px;
+        letter-spacing: 2px;
+        text-indent: 2px;
       }
 
       .next-preview {
-        width: 64px;
-        height: 48px;
-        padding-left: 8px;
+        flex: 0 0 72px;
+        width: 72px;
+        height: 56px;
+        padding: 0;
       }
     }
 
-    .instructions-label {
-      padding: 8px 10px;
+    .game-canvas-right .instructions-label {
+      padding: 8px 13px 8px 10px;
 
-      ul {
-        gap: 6px;
-      }
-
-      ul li {
-        gap: 8px;
-      }
-
-      ul ul {
-        width: auto;
-        flex: 1 1 auto;
-        min-width: 0;
+      .instruction-list {
+        column-gap: 8px;
+        row-gap: 6px;
       }
 
       .key-3d {
-        box-sizing: border-box;
-        flex: 0 0 48px;
-        width: 48px;
-        min-width: 48px;
         padding: 3px 4px;
-        text-align: center;
         box-shadow: 3px 0 0 #6a6b76;
-      }
-    }
-
-    .mobile-axes {
-      height: 128px;
-      margin-top: 4px;
-
-      canvas {
-        background: transparent !important;
       }
     }
   }

@@ -13,14 +13,14 @@
     "@react-three/fiber": "^8.16.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "three": "^0.157.0",
-    "three-stdlib": "^2.36.0"
+    "three": "^0.186.1",
+    "three-stdlib": "^2.36.1"
   },
   "devDependencies": {
     "@types/node": "^20.12.7",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
-    "@types/three": "^0.167.1",
+    "@types/three": "^0.186.0",
     "@types/web": "^0.0.153",
     "@typescript-eslint/eslint-plugin": "^8.69.0",
     "@typescript-eslint/parser": "^8.69.0",

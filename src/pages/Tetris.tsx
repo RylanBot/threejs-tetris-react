@@ -1,27 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { Vector3 } from 'three';
-import { Html, OrbitControls } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 
 import {
   CameraDirectionUpdater,
+  CameraViewportUpdater,
   ControlButton,
-  InstructionsList,
-  MiniAxes,
+  GameSideHud,
   MobileControlGroup,
-  NextPreviewCard,
-  PlayfieldCameraFitter,
   ThreeSidedGrid,
 } from '@/components';
 import { TetriminoGroup, TetriminoPile, TETRIMINOS } from '@/components/Tetrimino';
-import { HIGH_SCORE_KEY, isMobileDevice } from '@/libs/common';
+import { HIGH_SCORE_KEY, isMobileViewport } from '@/libs/common';
 import { applyRandomRotation, getRandomPosition, getRandomTetrimino } from '@/libs/generator';
 
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import type { Block, TetriminoType } from '@/components/Tetrimino';
 import type { ThreePosition } from '@/libs/common';
-
 const Tetris: React.FC = () => {
   const [currType, setCurrType] = useState<TetriminoType | null>(null);
   const [nextType, setNextType] = useState<TetriminoType | null>(null);
@@ -29,21 +26,16 @@ const Tetris: React.FC = () => {
   const [blocks, setBlocks] = useState<Block[] | null>(null);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(() => {
-    const savedScore = localStorage.getItem(HIGH_SCORE_KEY);
-    return savedScore ? parseInt(savedScore) : 0;
+    const score = localStorage.getItem(HIGH_SCORE_KEY);
+    return score ? parseInt(score) : 0;
   });
-
-  const [isPaused, setIsPaused] = useState(false);
+  const [gamePaused, setGamePaused] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameOver, setGameOver] = useState(false);
-  const [narrow, setNarrow] = useState(() => (typeof window !== 'undefined' ? window.innerWidth <= 768 : false));
 
-  const isMobile = isMobileDevice();
-  const mobileLayout = isMobile && narrow;
-  const panelX = mobileLayout ? -0.25 : -0.75;
-  const axesPosition: ThreePosition = mobileLayout ? [0, -1.42, 0] : [panelX + 0.75, -2.75, 0];
-  const centerHud = mobileLayout;
-
+  const [mobile, setMobile] = useState(() =>
+    typeof window !== 'undefined' ? isMobileViewport(window.innerWidth) : false,
+  );
   const [cameraDirection, setCameraDirection] = useState(new Vector3());
   const [gridState, setGridState] = useState<(string | null)[][][]>(() => {
     const initialState = [];
@@ -91,7 +83,7 @@ const Tetris: React.FC = () => {
     setPosition(newPosition);
     setNextType(getRandomTetrimino());
 
-    setIsPaused(false);
+    setGamePaused(false);
   };
 
   // 结束游戏
@@ -113,7 +105,7 @@ const Tetris: React.FC = () => {
       return newState;
     });
 
-    setIsPaused(false);
+    setGamePaused(false);
     setGameStarted(false);
     setGameOver(false);
 
@@ -133,12 +125,12 @@ const Tetris: React.FC = () => {
 
   // 暂停游戏
   const togglePause = () => {
-    setIsPaused((prevIsPaused) => !prevIsPaused);
+    setGamePaused((prevIsPaused) => !prevIsPaused);
   };
 
   // 方块开始下落
   const startFall = () => {
-    if (!position || !blocks || !currType || isPaused || gameOver) return;
+    if (!position || !blocks || !currType || gamePaused || gameOver) return;
 
     if (fallIntervalRef.current) {
       clearInterval(fallIntervalRef.current);
@@ -217,7 +209,7 @@ const Tetris: React.FC = () => {
 
   // 操控位置移动
   const handleKeyDown = (e: KeyboardEvent) => {
-    if (isPaused || !position || !blocks) return;
+    if (gamePaused || !position || !blocks) return;
 
     let [x, y, z] = position;
     let newBlocks = blocks;
@@ -362,7 +354,7 @@ const Tetris: React.FC = () => {
       }
     };
 
-    if (gameStarted && !isPaused) {
+    if (gameStarted && !gamePaused) {
       startFall();
       window.addEventListener('keydown', handleKeyDown);
     } else {
@@ -374,15 +366,15 @@ const Tetris: React.FC = () => {
       cleanupFall();
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [position, blocks, gameStarted, isPaused]);
+  }, [position, blocks, gameStarted, gamePaused]);
 
   useEffect(() => {
-    document.documentElement.classList.toggle('is-mobile', isMobile);
+    document.documentElement.classList.toggle('is-mobile', mobile);
     return () => document.documentElement.classList.remove('is-mobile');
-  }, [isMobile]);
+  }, [mobile]);
 
   useEffect(() => {
-    const onResize = () => setNarrow(window.innerWidth <= 768);
+    const onResize = () => setMobile(isMobileViewport(window.innerWidth));
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
@@ -431,7 +423,7 @@ const Tetris: React.FC = () => {
             shadowColor="#c0392b"
             onClick={togglePause}
           >
-            {isPaused ? 'Continue' : 'Pause'}
+            {gamePaused ? 'Continue' : 'Pause'}
           </ControlButton>
         </div>
       </div>
@@ -448,7 +440,7 @@ const Tetris: React.FC = () => {
         <div className="game-canvas-left">
           <Canvas
             camera={
-              mobileLayout
+              mobile
                 ? {
                     position: [14, 12, 14],
                     fov: 46,
@@ -460,17 +452,17 @@ const Tetris: React.FC = () => {
             <OrbitControls
               ref={controlsRef}
               makeDefault
-              target={mobileLayout ? [3, 5.5, 3] : [2, 6, 0]}
-              minDistance={mobileLayout ? 12 : 20}
-              maxDistance={mobileLayout ? 96 : 20}
+              target={mobile ? [3, 5.5, 3] : [2, 6, 0]}
+              minDistance={mobile ? 12 : 20}
+              maxDistance={mobile ? 96 : 20}
               minPolarAngle={0}
               maxPolarAngle={Math.PI / 2}
               minAzimuthAngle={0}
               maxAzimuthAngle={Math.PI / 2}
-              enabled={!isPaused}
+              enabled={!gamePaused}
               enablePan={false}
             />
-            <PlayfieldCameraFitter narrow={mobileLayout} />
+            <CameraViewportUpdater mobile={mobile} />
             <CameraDirectionUpdater onChange={setCameraDirection} />
 
             <ThreeSidedGrid />
@@ -485,114 +477,18 @@ const Tetris: React.FC = () => {
           </Canvas>
         </div>
 
-        {/* 其余信息 */}
         <div className="game-canvas-right">
-          {centerHud ? (
-            <div className="mobile-hud">
-              {gameStarted && (
-                <div className="score-label">
-                  <div className="score-item">
-                    <h2>Score</h2>
-                    <h2>{score}</h2>
-                  </div>
-                  {highScore > 0 && (
-                    <div className="score-item">
-                      <h2>High</h2>
-                      <h2>{highScore}</h2>
-                    </div>
-                  )}
-                </div>
-              )}
-              {nextType && (
-                <NextPreviewCard
-                  type={nextType}
-                  variant="dom"
-                />
-              )}
-              <div className="instructions-label">
-                <InstructionsList compact />
-              </div>
-              <div className="mobile-axes">
-                <Canvas
-                  camera={{
-                    position: [0, 2.6, 4.4],
-                    fov: 34,
-                  }}
-                  gl={{ alpha: true }}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    background: 'transparent',
-                    overflow: 'visible',
-                  }}
-                  onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
-                >
-                  <MiniAxes
-                    position={[0, 0, 0]}
-                    scale={0.72}
-                    direction={cameraDirection}
-                  />
-                </Canvas>
-              </div>
-            </div>
-          ) : (
-            <Canvas
-              style={{
-                width: '100%',
-                height: '100%',
-                overflow: 'visible',
-                background: 'transparent',
-              }}
-              gl={{ alpha: true }}
-              onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
-            >
-              <ambientLight />
-
-              {gameStarted && (
-                <Html
-                  position={[centerHud ? 0 : panelX, 1.6, 0]}
-                  center={centerHud}
-                  className="score-label"
-                >
-                  <div className="score-item">
-                    <h2>Score</h2>
-                    <h2>{score}</h2>
-                  </div>
-                  {highScore > 0 && (
-                    <div className="score-item">
-                      <h2>High</h2>
-                      <h2>{highScore}</h2>
-                    </div>
-                  )}
-                </Html>
-              )}
-
-              {nextType && (
-                <NextPreviewCard
-                  type={nextType}
-                  positionX={centerHud ? 0 : panelX}
-                  center={centerHud}
-                />
-              )}
-
-              <Html
-                position={[centerHud ? 0 : panelX, -0.4, 0]}
-                center={centerHud}
-                className="instructions-label"
-              >
-                <InstructionsList />
-              </Html>
-
-              <MiniAxes
-                position={axesPosition}
-                scale={0.4}
-                direction={cameraDirection}
-              />
-            </Canvas>
-          )}
+          <GameSideHud
+            mobile={mobile}
+            gameStarted={gameStarted}
+            score={score}
+            highScore={highScore}
+            nextType={nextType}
+            cameraDirection={cameraDirection}
+          />
         </div>
 
-        {narrow && <MobileControlGroup />}
+        {mobile && <MobileControlGroup />}
       </div>
     </>
   );

@@ -22,14 +22,14 @@ const DESKTOP_DISTANCE = 20;
 const DESKTOP_TARGET = new Vector3(2, 6, 0);
 const DESKTOP_POSITION = new Vector3(2, 6, DESKTOP_DISTANCE);
 
-interface PlayfieldCameraFitterProps {
-  narrow: boolean;
+interface CameraViewportUpdaterProps {
+  mobile: boolean;
 }
 
 /**
- * 按视口把相机框进游戏场地
+ * 随视口切换相机取景参数，确保场地完整可见
  */
-const PlayfieldCameraFitter: React.FC<PlayfieldCameraFitterProps> = ({ narrow }) => {
+const CameraViewportUpdater: React.FC<CameraViewportUpdaterProps> = ({ mobile }) => {
   const { camera, size, controls } = useThree();
   const fittedKey = useRef('');
 
@@ -39,7 +39,7 @@ const PlayfieldCameraFitter: React.FC<PlayfieldCameraFitterProps> = ({ narrow })
     if (!orbit) return;
 
     const key = `${size.width}x${size.height}`;
-    if (!narrow) {
+    if (!mobile) {
       fittedKey.current = '';
       cam.clearViewOffset();
       cam.fov = DESKTOP_FOV;
@@ -84,9 +84,9 @@ const PlayfieldCameraFitter: React.FC<PlayfieldCameraFitterProps> = ({ narrow })
     orbit.maxDistance = high;
     orbit.update();
     fittedKey.current = key;
-  }, [camera, controls, narrow, size.width, size.height]);
+  }, [camera, controls, mobile, size.width, size.height]);
 
   return null;
 };
 
-export default PlayfieldCameraFitter;
+export default CameraViewportUpdater;

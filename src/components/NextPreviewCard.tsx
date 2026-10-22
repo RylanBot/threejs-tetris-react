@@ -65,31 +65,19 @@ const PreviewCanvas: React.FC<{ type: TetriminoType }> = ({ type }) => {
 const NextPreviewCard: React.FC<{
   type: TetriminoType;
   positionX?: number;
+  positionY?: number;
   center?: boolean;
-  variant?: 'world' | 'dom';
-}> = ({ type, positionX = 0, center = false, variant = 'world' }) => {
-  const body = (
-    <>
-      <h2>Next</h2>
-      <div className="next-preview">
-        <PreviewCanvas type={type} />
-      </div>
-    </>
-  );
-
-  if (variant === 'dom') {
-    return <div className="next-label">{body}</div>;
-  }
-
-  return (
-    <Html
-      position={[positionX, 0.65, 0]}
-      center={center}
-      className="next-label"
-    >
-      {body}
-    </Html>
-  );
-};
+}> = ({ type, positionX = 0, positionY = 0.65, center = false }) => (
+  <Html
+    position={[positionX, positionY, 0]}
+    center={center}
+    className="next-label"
+  >
+    <h2>Next</h2>
+    <div className="next-preview">
+      <PreviewCanvas type={type} />
+    </div>
+  </Html>
+);
 
 export default NextPreviewCard;
