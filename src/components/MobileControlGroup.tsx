@@ -1,13 +1,9 @@
-import { isMobileDevice } from '@/libs/common';
-
 import ControlButton from './ControlButton';
 
 /**
  * 移动端模拟键盘
  */
 const MobileControlGroup = () => {
-  if (!isMobileDevice()) return null;
-
   const simulateKeyPress = (key: string) => {
     return () => {
       const event = new KeyboardEvent('keydown', {

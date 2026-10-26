@@ -1,25 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { Vector3 } from 'three';
-import { Html, OrbitControls } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 
 import {
   CameraDirectionUpdater,
+  CameraViewportUpdater,
   ControlButton,
-  MiniAxes,
+  GameSideHud,
   MobileControlGroup,
-  NextPreviewCard,
   ThreeSidedGrid,
 } from '@/components';
 import { TetriminoGroup, TetriminoPile, TETRIMINOS } from '@/components/Tetrimino';
-import { HIGH_SCORE_KEY, isMobileDevice } from '@/libs/common';
+import { HIGH_SCORE_KEY, isMobileViewport } from '@/libs/common';
 import { applyRandomRotation, getRandomPosition, getRandomTetrimino } from '@/libs/generator';
 
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import type { Block, TetriminoType } from '@/components/Tetrimino';
 import type { ThreePosition } from '@/libs/common';
-
 const Tetris: React.FC = () => {
   const [currType, setCurrType] = useState<TetriminoType | null>(null);
   const [nextType, setNextType] = useState<TetriminoType | null>(null);
@@ -27,17 +26,16 @@ const Tetris: React.FC = () => {
   const [blocks, setBlocks] = useState<Block[] | null>(null);
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(() => {
-    const savedScore = localStorage.getItem(HIGH_SCORE_KEY);
-    return savedScore ? parseInt(savedScore) : 0;
+    const score = localStorage.getItem(HIGH_SCORE_KEY);
+    return score ? parseInt(score) : 0;
   });
-
-  const [isPaused, setIsPaused] = useState(false);
+  const [gamePaused, setGamePaused] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameOver, setGameOver] = useState(false);
 
-  const isMobile = isMobileDevice();
-  const panelX = isMobile ? -0.25 : -0.75;
-
+  const [mobile, setMobile] = useState(() =>
+    typeof window !== 'undefined' ? isMobileViewport(window.innerWidth) : false,
+  );
   const [cameraDirection, setCameraDirection] = useState(new Vector3());
   const [gridState, setGridState] = useState<(string | null)[][][]>(() => {
     const initialState = [];
@@ -85,7 +83,7 @@ const Tetris: React.FC = () => {
     setPosition(newPosition);
     setNextType(getRandomTetrimino());
 
-    setIsPaused(false);
+    setGamePaused(false);
   };
 
   // 结束游戏
@@ -107,7 +105,7 @@ const Tetris: React.FC = () => {
       return newState;
     });
 
-    setIsPaused(false);
+    setGamePaused(false);
     setGameStarted(false);
     setGameOver(false);
 
@@ -127,12 +125,12 @@ const Tetris: React.FC = () => {
 
   // 暂停游戏
   const togglePause = () => {
-    setIsPaused((prevIsPaused) => !prevIsPaused);
+    setGamePaused((prevIsPaused) => !prevIsPaused);
   };
 
   // 方块开始下落
   const startFall = () => {
-    if (!position || !blocks || !currType || isPaused || gameOver) return;
+    if (!position || !blocks || !currType || gamePaused || gameOver) return;
 
     if (fallIntervalRef.current) {
       clearInterval(fallIntervalRef.current);
@@ -211,7 +209,7 @@ const Tetris: React.FC = () => {
 
   // 操控位置移动
   const handleKeyDown = (e: KeyboardEvent) => {
-    if (isPaused || !position || !blocks) return;
+    if (gamePaused || !position || !blocks) return;
 
     let [x, y, z] = position;
     let newBlocks = blocks;
@@ -356,7 +354,7 @@ const Tetris: React.FC = () => {
       }
     };
 
-    if (gameStarted && !isPaused) {
+    if (gameStarted && !gamePaused) {
       startFall();
       window.addEventListener('keydown', handleKeyDown);
     } else {
@@ -368,7 +366,18 @@ const Tetris: React.FC = () => {
       cleanupFall();
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [position, blocks, gameStarted, isPaused]);
+  }, [position, blocks, gameStarted, gamePaused]);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('is-mobile', mobile);
+    return () => document.documentElement.classList.remove('is-mobile');
+  }, [mobile]);
+
+  useEffect(() => {
+    const onResize = () => setMobile(isMobileViewport(window.innerWidth));
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   useEffect(() => {
     if (gameOver && score > highScore) {
@@ -414,7 +423,7 @@ const Tetris: React.FC = () => {
             shadowColor="#c0392b"
             onClick={togglePause}
           >
-            {isPaused ? 'Continue' : 'Pause'}
+            {gamePaused ? 'Continue' : 'Pause'}
           </ControlButton>
         </div>
       </div>
@@ -429,20 +438,31 @@ const Tetris: React.FC = () => {
 
         {/* 游戏内容 */}
         <div className="game-canvas-left">
-          <Canvas>
+          <Canvas
+            camera={
+              mobile
+                ? {
+                    position: [14, 12, 14],
+                    fov: 46,
+                  }
+                : undefined
+            }
+          >
             <ambientLight intensity={2} />
             <OrbitControls
               ref={controlsRef}
-              target={[2, 6, 0]}
-              minDistance={20}
-              maxDistance={20}
+              makeDefault
+              target={mobile ? [3, 5.5, 3] : [2, 6, 0]}
+              minDistance={mobile ? 12 : 20}
+              maxDistance={mobile ? 96 : 20}
               minPolarAngle={0}
               maxPolarAngle={Math.PI / 2}
               minAzimuthAngle={0}
               maxAzimuthAngle={Math.PI / 2}
-              enabled={!isPaused}
+              enabled={!gamePaused}
               enablePan={false}
             />
+            <CameraViewportUpdater mobile={mobile} />
             <CameraDirectionUpdater onChange={setCameraDirection} />
 
             <ThreeSidedGrid />
@@ -457,77 +477,18 @@ const Tetris: React.FC = () => {
           </Canvas>
         </div>
 
-        {/* 其余信息 */}
         <div className="game-canvas-right">
-          <Canvas
-            style={{
-              width: '100%',
-              height: '100%',
-            }}
-          >
-            <ambientLight />
-
-            {gameStarted && (
-              <Html
-                position={[panelX, 1.6, 0]}
-                className="score-label"
-              >
-                <div className="score-item">
-                  <h2>Score</h2>
-                  <h2>{score}</h2>
-                </div>
-                {highScore > 0 && (
-                  <div className="score-item">
-                    <h2>High</h2>
-                    <h2>{highScore}</h2>
-                  </div>
-                )}
-              </Html>
-            )}
-
-            {nextType && (
-              <NextPreviewCard
-                type={nextType}
-                positionX={panelX}
-              />
-            )}
-
-            <Html
-              position={[panelX, -0.4, 0]}
-              className="instructions-label"
-            >
-              <ul>
-                <li>
-                  <strong>Drag</strong> <span className="button-3d key-3d">Mouse</span>
-                </li>
-                <li>
-                  <strong>Rotate</strong>
-                  <ul>
-                    <li>
-                      <strong>X-axis</strong> <span className="button-3d key-3d">Q</span>
-                    </li>
-                    <li>
-                      <strong>Y-axis</strong> <span className="button-3d key-3d">E</span>
-                    </li>
-                    <li>
-                      <strong>Z-axis</strong> <span className="button-3d key-3d">R</span>
-                    </li>
-                  </ul>
-                </li>
-                <li>
-                  <strong>Drop</strong> <span className="button-3d key-3d">Space</span>
-                </li>
-              </ul>
-            </Html>
-
-            <MiniAxes
-              position={[panelX + 0.75, -2.75, 0]}
-              direction={cameraDirection}
-            />
-          </Canvas>
+          <GameSideHud
+            mobile={mobile}
+            gameStarted={gameStarted}
+            score={score}
+            highScore={highScore}
+            nextType={nextType}
+            cameraDirection={cameraDirection}
+          />
         </div>
 
-        <MobileControlGroup />
+        {mobile && <MobileControlGroup />}
       </div>
     </>
   );
