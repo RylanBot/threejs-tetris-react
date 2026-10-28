@@ -32,12 +32,18 @@
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+  touch-action: none;
 }
 
 html,
 body,
 #root {
   background: var(--game-bg);
+  overscroll-behavior: none;
+}
+
+canvas {
+  touch-action: none !important;
 }
 
 html.is-mobile,
