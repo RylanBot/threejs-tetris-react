@@ -9,6 +9,7 @@ import {
   CameraViewportUpdater,
   ControlButton,
   GameSideHud,
+  GitHubLogo,
   MobileControlGroup,
   ThreeSidedGrid,
 } from '@/components';
@@ -19,6 +20,7 @@ import { applyRandomRotation, getRandomPosition, getRandomTetrimino } from '@/li
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import type { Block, TetriminoType } from '@/components/Tetrimino';
 import type { ThreePosition } from '@/libs/common';
+
 const Tetris: React.FC = () => {
   const [currType, setCurrType] = useState<TetriminoType | null>(null);
   const [nextType, setNextType] = useState<TetriminoType | null>(null);
@@ -32,7 +34,6 @@ const Tetris: React.FC = () => {
   const [gamePaused, setGamePaused] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
   const [gameOver, setGameOver] = useState(false);
-
   const [mobile, setMobile] = useState(() =>
     typeof window !== 'undefined' ? isMobileViewport(window.innerWidth) : false,
   );
@@ -244,7 +245,7 @@ const Tetris: React.FC = () => {
           z -= 1;
         }
         break;
-      // 沿x轴旋转
+      // 沿 x 轴旋转
       case 'Q':
         newBlocks = blocks.map((block) => ({
           x: block.x,
@@ -252,7 +253,7 @@ const Tetris: React.FC = () => {
           z: -block.y,
         }));
         break;
-      // 沿y轴旋转
+      // 沿 y 轴旋转
       case 'E':
         newBlocks = blocks.map((block) => ({
           x: -block.z,
@@ -260,7 +261,7 @@ const Tetris: React.FC = () => {
           z: block.x,
         }));
         break;
-      //沿z轴旋转
+      //沿 z 轴旋转
       case 'R':
         newBlocks = blocks.map((block) => ({
           x: block.y,
@@ -397,12 +398,7 @@ const Tetris: React.FC = () => {
             target="_blank"
             href="https://github.com/RylanBot/threejs-tetris-react"
           >
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.79-.26.79-.58v-2.23c-3.34.73-4.03-1.42-4.03-1.42-.55-1.38-1.33-1.76-1.33-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49.99.11-.77.42-1.31.76-1.61-2.66-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.53-1.52.12-3.18 0 0 .98-.31 3.21 1.23a11.1 11.1 0 0 1 2.92-.39c.99.01 2.02.14 3.01.39 2.29-1.54 3.28-1.23 3.28-1.23.65 1.65.24 2.87.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.81 5.62-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.19.69.8.58C20.56 21.8 24 17.3 24 12 24 5.37 18.63 0 12 0Z" />
-            </svg>
+            <GitHubLogo />
           </a>
 
           <h1 className="title-3d">3D Tetris</h1>

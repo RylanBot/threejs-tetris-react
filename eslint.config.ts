@@ -65,6 +65,7 @@ const eslintConfig: Linter.Config[] = [
         },
       ],
       'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
+      'import/newline-after-import': ['error', { count: 1 }],
       'n/prefer-node-protocol': 'error',
       'simple-import-sort/exports': 'error',
       'simple-import-sort/imports': [
